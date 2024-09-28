@@ -1,0 +1,890 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>BHAV to Mermaid diagram</title>
+	<link rel="icon" type="image/x-icon" href="favicon.svg">
+	<style>
+		:root {
+			--flex-direction-x: column;
+			--flex-direction-y: row;
+			--flex-gap: .5rem;
+			--border-radius: .25rem;
+			--border: solid #0004 1px;
+			--transition: all .05s ease-in-out;
+			--site-background: #444;
+		}
+
+		@media (max-width: 100vh) {
+			:root {
+				--flex-direction-x: row;
+				--flex-direction-y: column;
+			}
+		}
+
+		html {
+			font-size: 16px;
+		}
+
+		body {
+			display: flex;
+			flex-direction: var(--flex-direction-y);
+			margin: 0;
+			padding: .5rem;
+			gap: var(--flex-gap);
+			height: calc(100vh - 2 * .5rem);
+			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Helvetica,Arial,sans-serif,sans-serif;
+			background: var(--site-background);
+		}
+
+		section {
+			display: flex;
+			flex: 1 1 0;
+			flex-direction: var(--flex-direction-x);
+			gap: var(--flex-gap);
+		}
+
+		textarea, iframe {
+			flex-grow: 1;
+		}
+
+		textarea, iframe, button, select {
+			border-radius: var(--border-radius);
+			border: var(--border);
+			font-family: inherit;
+		}
+
+		textarea {
+			min-height: 1rem;
+			min-width: 3rem;
+			resize: none;
+			font-family: "Consolas", monospace;
+			font-size: .8rem;
+			font-weight: 500;
+		}
+
+		textarea[readonly] {
+			opacity: 0.8;
+		}
+
+		textarea.error {
+			color: #fff;
+			background: #a10;
+			font-weight: bold;
+		}
+
+		iframe:not([src]) {
+			display: none;
+		}
+
+		button {
+			background: #eee;
+			padding: .2rem .6rem;
+			margin-bottom: .1rem;
+			box-shadow: 0 .2rem 0 #aaa;
+			transition: var(--transition);
+			cursor: pointer;
+		}
+
+		button:active {
+			transform: translateY(.2rem);
+			box-shadow: 0 0 0 #aaa;
+		}
+
+		select {
+			padding: .2rem 1.2rem .2rem .4rem;
+			background: #fff;
+			background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggc3R5bGU9ImZpbGw6YmxhY2s7c3Ryb2tlOm5vbmUiIGQ9Ik0gMCwyLjUgSCAxLjc1IEwgNSw2IDguMjUsMi41IEggMTAgTCA1LDggWiIvPjwvc3ZnPg");
+			background-size: .6rem;
+			background-position: right .3rem top 55%;
+  			background-repeat: no-repeat;
+			appearance: none;
+			cursor: pointer;
+		}
+
+		#textareas {
+			flex: 1 1;
+		}
+
+		#visual-output {
+			flex: 2 0;
+			position: relative;
+		}
+
+		#settings {
+			flex: 0 1;
+			flex-direction: var(--flex-direction-y);
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: stretch;
+		}
+
+		#site-icons {
+			display: flex;
+			flex: 0;
+			flex-direction: row;
+			gap: var(--flex-gap);
+			justify-content: center;
+		}
+
+		#site-icons a {
+			display: flex;
+			align-items: center;
+		}
+
+		#diagram-tooltip {
+			position: absolute;
+			display: flex;
+			overflow: hidden;
+			padding: 0 .2rem .2rem 0;
+			border-top-left-radius: var(--border-radius);
+			border-bottom-right-radius: 50%;
+			background: var(--site-background);
+			cursor: help;
+		}
+
+		#diagram:not([src]) + #diagram-tooltip {
+			opacity: 0;
+		}
+	</style>
+</head>
+
+<body>
+	<section id="textareas">
+		<textarea id="input-code" spellcheck="false" title="Here goes your BHAV code"></textarea>
+		<section id="settings">
+			<button id="tutorial-button" title="Replace the code in the BHAV textbox with a tutorial code">Show tutorial</button>
+			<button id="paste-button" title="Paste the copied text from your clipboard into the BHAV textbox">Paste code</button>
+			<select id="loop-handling-select" title="Set how loops are displayed">
+				<option value="0">Don't highlight loops</option>
+				<option value="1">Outer loops only</option>
+				<option value="2" selected>Similar loops grouped</option>
+				<option value="3">Detailed loops</option>
+			</select>
+			<select id="theme-select" title="Change the theme if you cannot see the text in blocks">
+				<option value="base">Dark text</option>
+				<option value="dark" selected>Light text</option>
+			</select>
+			<div id="site-icons">
+				<a href="https://github.com/Cosmatevs/cosmatevs.github.io" target="_blank" title="Go to the GitHub repository">
+					<svg width="1.5rem" viewbox="0 0 98 96" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="#fff"/>
+					</svg>
+				</a>
+				<a href="https://discord.gg/FrUfF8TN2h" target="_blank" title="Join the Discord server: Nopke's Labs">
+					<svg width="1.5rem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
+						<path style="fill:#fff;" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+					</svg>
+				</a>
+				<a href="https://mermaid.live/edit" target="_blank" title="Go to the Mermaid Live website">
+					<svg width="1.5rem" viewBox="0 0 491 491" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+						<path d="M490.16,84.61C490.16,37.912 452.248,0 405.55,0L84.61,0C37.912,0 0,37.912 0,84.61L0,405.55C0,452.248 37.912,490.16 84.61,490.16L405.55,490.16C452.248,490.16 490.16,452.248 490.16,405.55L490.16,84.61Z" style="fill:rgb(255,54,112);"/>
+						<path d="M407.48,111.18C335.587,108.103 269.573,152.338 245.08,220C220.587,152.338 154.573,108.103 82.68,111.18C80.285,168.229 107.577,222.632 154.74,254.82C178.908,271.419 193.35,298.951 193.27,328.27L193.27,379.13L296.9,379.13L296.9,328.27C296.816,298.953 311.255,271.42 335.42,254.82C382.596,222.644 409.892,168.233 407.48,111.18Z" style="fill:white;fill-rule:nonzero;"/>
+					</svg>
+				</a>
+			</div>
+		</section>
+		<textarea id="output-code" readonly title="The BHAV code translated into Mermaid diagram code"></textarea>
+	</section>
+	<section id="visual-output">
+		<iframe id="diagram">
+		</iframe>
+		<div id="diagram-tooltip" title="Pan: click and drag the diagram area &#10;Zoom: use the mouse wheel in the diagram area &#10;Reset view: click the RESET button in the bottom right corner">
+			<svg width="1.5rem" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+				<path style="fill:#fff" d="m0 20c0 11.046 8.9542 20 20 20 11.046 1.42e-4 20-8.954 20-20-1.42e-4 -11.046-8.9542-20-20-20h-20zm19.5-12.5c5 0 7.4998 2.5002 7.4998 6.0002 0 5.5-6.0002 5.9999-6.0002 9.9999 0 1 0.50023 1.5002 0.50023 1.5002h-4.5s-0.50023-1.0001-0.50023-2.5001c0-4.5 5.0002-4.9999 5.0002-8 0-1.5-0.97897-2.5001-2.5001-2.5001-3 0-4.9997 1.9999-4.9997 1.9999v-4.9997s1.9999-1.5002 5.4999-1.5002zm-2e-5 20c2 0 2.9998 1.0001 2.9998 2.5001s-0.99982 2.4996-2.9998 2.4996-3.0003-0.99959-3.0003-2.4996 1.0003-2.5001 3.0003-2.5001z"/>
+			</svg>
+		</div>
+	</section>
+
+	<script>
+	const inputArea = document.getElementById("input-code");
+	const themeSelect = document.getElementById("theme-select");
+	const loopHandlingSelect = document.getElementById("loop-handling-select");
+	const pasteButton = document.getElementById("paste-button");
+	const tutorialButton = document.getElementById("tutorial-button");
+	const outputArea = document.getElementById("output-code");
+	const diagram = document.getElementById("diagram");
+
+	inputArea.addEventListener('input', debounce(() => handleInput(inputArea.value), 500));
+	themeSelect.addEventListener('change', () => setupDiagram(outputArea.value));
+	loopHandlingSelect.addEventListener('change', () => handleInput(inputArea.value));
+	pasteButton.addEventListener('click', () => pasteClipboardIntoInput());
+	tutorialButton.addEventListener('click', () => showTutorial());
+
+	function debounce(callback, wait) {
+		let timeoutId = null;
+		return (...args) => {
+			window.clearTimeout(timeoutId);
+			timeoutId = window.setTimeout(
+				() => callback(...args), wait
+			);
+		};
+	}
+
+	function handleInput(input) {
+		outputArea.classList.remove("error");
+
+		if (input.trim().length === 0)
+		{
+			outputArea.value = '';
+			diagram.removeAttribute("src");
+			return;
+		}
+		try {
+			let bhavBlocks = BhavBlock.getBlocksFromSimPeText(input);
+			let bhavBlockHierarchies = BhavBlockHierarchy.getBlockHierarchies(bhavBlocks, getBlockHierarchyProperties());
+			let mermaidCode = MermaidGraphCodeBuilder.getCodeFromBlockHierarchies(bhavBlockHierarchies);
+			outputArea.value = mermaidCode;
+
+			setupDiagram(mermaidCode, true);
+		}
+		catch (error) {
+			console.error(error);
+			outputArea.value = `The tool couldn't translate your BHAV into a mermaid diagram. Make sure it's correct.\r\n\r\n${error}`;
+			outputArea.classList.add("error");
+			diagram.removeAttribute("src");
+		}
+	}
+
+	function getBlockHierarchyProperties() {
+		let properties = {
+			loopHandling: Number(loopHandlingSelect.value)
+		}
+		return properties;
+	}
+
+	function setupDiagram(mermaidCode, resetPanZoom = false) {
+		if (mermaidCode.trim().length === 0) {
+			diagram.removeAttribute("src");
+			return;
+		}
+		try {
+			let mermaidSetup = {
+				"code": mermaidCode,
+				"mermaid": {
+					"theme": themeSelect.value,
+					"useMaxWidth": true
+				},
+				"panZoom": true,
+				"rough": false,
+				"autoSync": false
+			};
+			if (resetPanZoom) {
+				mermaidSetup.zoom = 1;
+				mermaidSetup.pan = { "x": 0, "y": 0 };
+			}
+			diagram.src = "https://mermaid.live/view#base64:" + encodeBase64Uri(JSON.stringify(mermaidSetup));
+			diagram.classList.remove("error");
+		}
+		catch (error) {
+			console.error(error);
+			diagram.classList.add("error");
+			diagram.removeAttribute("src");
+		}
+	}
+
+	function showTutorial() {
+		inputArea.value = tutorialSimPeBhav;
+		handleInput(inputArea.value);
+	}
+
+	function pasteClipboardIntoInput() {
+		navigator.clipboard
+			.readText()
+			.then(text => {
+				inputArea.value = text;
+				handleInput(inputArea.value)
+			});
+	}
+
+	const tutorialSimPeBhav = `
+     0000 : 2001 : 00 : 0001 : FFFC : 00000000000000000000000000000000
+[semi 0x2001] Open in SimPe a package file with the BHAV (you'd like to see as a diagram)
+
+     0001 : 2002 : 00 : 0002 : FFFC : 00000000000000000000000000000000
+[semi 0x2002] Open the BHAV resource (from the Resource List,
+in the Plugin View)
+
+     0002 : 0002 : 00 : 0004 : 0003 : 00000000000000000000000000000000
+[prim 0x0002] Expression  (Is the 'Special buttons' checkbox checked? (It's on the bottom right))
+
+     0003 : 0002 : 00 : 0004 : FFFC : 00000000000000000000000000000000
+[prim 0x0002] Expression  (Check the 'Special buttons' checkbox)
+
+     0004 : 2003 : 00 : 0005 : FFFC : 00000000000000000000000000000000
+[semi 0x2003] Click the 'Copy' button  ()
+
+     0005 : 1004 : 00 : 0006 : FFFC : 00000000000000000000000000000000
+[private 0x1004] Paste the copied BHAV in the tool (in the first textarea, on the left side)
+
+     0006 : 0118 : 00 : 0007 : FFFC : 00000000000000000000000000000000
+[global 0x0118] Idle (1 second)
+
+     0007 : 0002 : 00 : 0008 : 000A : 00000000000000000000000000000000
+[prim 0x0002] Expression (Is the diagram visible?)
+
+     0008 : 0002 : 00 : FFFD : 0009 : 00000000000000000000000000000000
+[prim 0x0002] Expression (Does the diagram look correct?)
+
+     0009 : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
+[semi 0x2008] Report a bug (Attach the BHAV code you've pasted into the tool. Explain what's wrong with the diagram)
+
+     000A : 0002 : 00 : 000B : 000C : 00000000000000000000000000000000
+[prim 0x0002] Expression (Is the second textarea red?)
+
+     000B : 0002 : 00 : 0001 : 000C : 00000000000000000000000000000000
+[prim 0x0002] Expression (Does the error description in it imply that it's your fault and you think it might be true?)
+
+     000C : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
+[semi 0x2008] Report a bug (Attach the BHAV code you've pasted into the tool)
+
+     000D : 0002 : 00 : FFFD : 000E : 00000000000000000000000000000000
+[prim 0x0002] Expression (Do you know what the colors of lines with arrows mean?)
+
+     000E : 1003 : 00 : 000F : 000F : 00000000000000000000000000000000
+[private 0x1003] See explanation (A <b>green</b> line shows what happens after a block returns <i>true</i>)
+
+     000F : 1003 : 00 : 0010 : 0010 : 00000000000000000000000000000000
+[private 0x1003] See explanation (A <b>red</b> line shows what happens after a block returns <i>false</i>)
+
+     0010 : 1003 : 00 : FFFD : FFFD : 00000000000000000000000000000000
+[private 0x1003] See explanation (A <b>grey</b> line shows what happens after a block returns either <i>true</i> or <i>false</i>)`
+
+	function encodeBase64Uri(string) {
+		let bytes = new TextEncoder().encode(string);
+		let binaryString = String.fromCodePoint(...bytes);
+		let base64Encoded = btoa(binaryString);
+		let base64EncodedUri = base64Encoded.replaceAll('\\', '_').replaceAll('+', '-');
+
+		return base64EncodedUri;
+	}
+
+	function removeFromArray(array, object) {
+		array.splice(array.indexOf(object), 1);
+	}
+
+	function toHex(number, fixedLength = 0) {
+		return '0x' + number.toString(16).toUpperCase().padStart(fixedLength, '0');
+	}
+
+	/* BHAV representation classes */
+
+	class BhavBlock {
+		constructor(properties) {
+			Object.assign(this, properties);
+			this.description = this.description ?? '';
+			this.type = this.type ?? (
+				this.instance < 0x0000 ? 'unknown'
+				: this.instance < 0x0100 ? 'primitive'
+				: this.instance < 0x1000 ? 'global'
+				: this.instance < 0x2000 ? 'private'
+				: this.instance < 0x10000 ? 'semiglobal'
+				: 'unknown');
+			this.outgoingTransitions = this.#prepareRawOutgoingTransitions(this.trueBlockId, this.falseBlockId);
+			delete this.trueBlockId;
+			delete this.falseBlockId;
+		}
+
+		#prepareRawOutgoingTransitions(trueBlockId, falseBlockId) {
+			let transitions = [];
+			if (trueBlockId === falseBlockId) {
+				if (trueBlockId !== null)
+					transitions.push(new BhavTransition(this.id, trueBlockId, BhavTransition.types.both));
+			}
+			else {
+				if (trueBlockId !== null)
+					transitions.push(new BhavTransition(this.id, trueBlockId, BhavTransition.types.true));
+
+				if (falseBlockId !== this.constructor.specialIds.undefined && falseBlockId !== null) {
+					transitions.push(new BhavTransition(this.id, falseBlockId, BhavTransition.types.false));
+				}
+			}
+			return transitions;
+		}
+
+		setTransitionReferencesToBlocks(blocks) {
+			this.outgoingTransitions.forEach(transition => transition.setReferencesToBlocks(blocks));
+		}
+
+		static specialIds = {
+			start: -1,
+			false: 0xFFFE,
+			true: 0xFFFD,
+			undefined: 0xFFFC
+		};
+		static #specialNames = {
+			"-1": 'start',
+			0xFFFE: 'false',
+			0xFFFD: 'true',
+			0xFFFC: 'undefined'
+		};
+
+		static createSpecial(id, trueBlockId = null, falseBlockId = null) {
+			let block;
+			if (id in this.#specialNames)
+				block = new BhavBlock({
+					id: id,
+					type: this.#specialNames[id],
+					name: this.#specialNames[id].toUpperCase(),
+					trueBlockId: trueBlockId,
+					falseBlockId: falseBlockId,
+					isSpecial: true
+				});
+			else
+				block = new BhavBlock({
+					id: id,
+					type: 'missing',
+					name: `MISSING ${toHex(id)}`,
+					trueBlockId: trueBlockId,
+					falseBlockId: falseBlockId,
+					isSpecial: true
+				});
+			
+			return block;
+		}
+
+		static #simPeBhavRegex = /^\s*(?<id>[A-F\d]{4}) : (?<instance>[A-F\d]{4}) : (?<version>\d\d) : (?<trueBlockId>[A-F\d]{4}) : (?<falseBlockId>[A-F\d]{4}) : (?<rawOperands>[A-F\d]{32})\r?\n\[[a-z]+ 0x[A-F\d]{4}\] (?<name>.+?) \((?<description>[\u0000-\uFFFF]*?)\)(?:\s*\r?\n)/gm;
+		static getBlocksFromSimPeText(simPeText) {
+			let text = simPeText.replaceAll('"', "'").replaceAll('$', '\\$').trim();
+			text += '\r\n';
+
+			let blocks = [];
+			let duplicateBlockIds = new Set();
+			let match;
+
+			while ((match = this.#simPeBhavRegex.exec(text)) !== null) {
+				let g = match.groups;
+				let block = new BhavBlock({
+					id: Number(`0x${g.id}`),
+					version: g.version,
+					instance: Number(`0x${g.instance}`),
+					rawOperands: g.rawOperands,
+					name: g.name,
+					description: g.description,
+					trueBlockId: Number(`0x${g.trueBlockId}`),
+					falseBlockId: Number(`0x${g.falseBlockId}`)
+				});
+				
+				if (blocks.some(existingBlock => existingBlock.id === block.id))
+					duplicateBlockIds.add(block.id);
+				else
+					blocks.push(block);
+			}
+
+			if (blocks.length === 0)
+				throw new Error('No valid blocks found');
+
+			if (duplicateBlockIds.size === 1)
+				throw new Error(`Block ${toHex([...duplicateBlockIds][0])} occurs more than once`);
+			else if (duplicateBlockIds.size > 1)
+				throw new Error(`Blocks ${[...duplicateBlockIds].map(id => toHex(id)).join(", ")} occur more than once`);
+
+			let expectedBlockIds = [...Array(Math.max(...blocks.map(block => block.id)) + 1).keys()];
+			let missingBlocks = expectedBlockIds.filter(id => blocks.some(block => block.id === id) === false);
+
+			if (missingBlocks.length === 1)
+				throw new Error(`Block ${toHex(missingBlocks[0])} is missing or couldn't be translated`);
+			else if (missingBlocks.length > 1)
+				throw new Error(`Blocks ${missingBlocks.map(id => toHex(id)).join(", ")} are missing or couldn't be translated`);
+
+			blocks = this.#extendWithSpecialBlocks(blocks);
+			blocks.forEach(block => block.setTransitionReferencesToBlocks(blocks));
+
+			return blocks;
+		}
+
+		static #extendWithSpecialBlocks(blocks) {
+			let blocksWithSpecial = [...blocks];
+			if (!blocksWithSpecial.some(x => x.id === BhavBlock.specialIds.start))
+				blocksWithSpecial.push(BhavBlock.createSpecial(BhavBlock.specialIds.start, 0, 0));
+
+			blocksWithSpecial.forEach(block => {
+				block.outgoingTransitions.forEach(transition => {
+					if (blocksWithSpecial.some(x => x.id === transition.endBlockId))
+						return;
+
+					blocksWithSpecial.push(BhavBlock.createSpecial(transition.endBlockId));
+				});
+			});
+
+			return blocksWithSpecial;
+		}
+	}
+
+	class BhavTransition {
+		static types = {
+			false: "FALSE",
+			true: "TRUE",
+			both: "BOTH"
+		}
+
+		constructor(startBlockId, endBlockId, type) {
+			this.startBlockId = startBlockId;
+			this.endBlockId = endBlockId;
+			this.type = type;
+		}
+
+		setReferencesToBlocks(blocks) {
+			this.startBlock = blocks.find(block => block.id === this.startBlockId);
+			delete this.startBlockId;
+			this.endBlock = blocks.find(block => block.id === this.endBlockId);
+			delete this.endBlockId;
+		}
+	}
+
+	class BhavBlockHierarchy {
+		blocksOnThisLevel;
+		blocksOnAllLevels;
+		subBlockLoopHierarchies;
+
+		static loopHandlingSettings = 
+			{
+				none: 0,
+				outerOnly: 1,
+				similarGrouped: 2,
+				detailed: 3
+			};
+
+		constructor(blocks, blockLoops, properties) {
+			this.blocksOnAllLevels = [...new Set(blocks)];
+
+			if (blockLoops.length === 0) {
+				this.blocksOnThisLevel = [...this.blocksOnAllLevels];
+				this.subBlockLoopHierarchies = [];
+				return;
+			}
+			
+			this.subBlockLoopHierarchies = this.#getLoopHierarchies(blockLoops, properties?.loopHandling);
+			this.blocksOnThisLevel = this.blocksOnAllLevels
+				.filter(block => this.subBlockLoopHierarchies
+					.some(subBlockLoopHierarchy => subBlockLoopHierarchy.blocksOnAllLevels.includes(block))
+					== false
+				);
+		}
+
+		#getLoopHierarchies(blockLoops, loopHandling = this.constructor.loopHandlingSettings.none) {
+			if (Object.values(this.constructor.loopHandlingSettings).includes(loopHandling) === false)
+				throw new Error(`Unknown loop handling setting: '${loopHandling}'`);
+
+			if (loopHandling == this.constructor.loopHandlingSettings.none)
+				return [];
+			
+			let loopGroups = [];
+			let blockLoopsFromBiggest = blockLoops.toSorted((a, b) => b.length - a.length);
+
+			blockLoopsFromBiggest.forEach(blockLoop => {
+				let matchingLoopGroups = loopGroups
+					.filter(loopGroup => blockLoop
+						.some(block => loopGroup.blocks.has(block)
+						)
+					);
+
+				if (matchingLoopGroups.length === 0) {
+					let loopGroup = {
+						blocks: new Set(blockLoop),
+						mainBlockLoops: [blockLoop],
+						subBlockLoops: []
+					}
+					loopGroups.push(loopGroup);
+					return;
+				}
+
+				let firstLoopGroup = matchingLoopGroups[0];
+				blockLoop.forEach(block => firstLoopGroup.blocks.add(block));
+
+				if (matchingLoopGroups.length > 1) {
+					firstLoopGroup.mainBlockLoops.push(blockLoop);
+
+					for (let i = 1; i < matchingLoopGroups.length; i++) {
+						var loopGroupToMerge = matchingLoopGroups[i];
+
+						loopGroupToMerge.blocks.forEach(block => firstLoopGroup.add(block));
+						firstLoopGroup.mainBlockLoops.push(...loopGroupToMerge.mainBlockLoops);
+						firstLoopGroup.subBlockLoops.push(...loopGroupToMerge.subBlockLoops);
+						removeFromArray(loopGroups, loopGroupToMerge);
+					}
+					return;
+				}
+
+				let shouldBlockLoopBeSub = firstLoopGroup.mainBlockLoops
+					.some(mainBlockLoop =>
+						blockLoop.length < mainBlockLoop.length
+						&& blockLoop.every(block => mainBlockLoop.includes(block))
+					);
+
+				if (shouldBlockLoopBeSub)
+					firstLoopGroup.subBlockLoops.push(blockLoop);
+				else
+					firstLoopGroup.mainBlockLoops.push(blockLoop);
+			});
+
+			if (loopHandling == this.constructor.loopHandlingSettings.outerOnly)
+			{
+				let blockLoopHierarchies = loopGroups.map(loopGroup => new BhavBlockLoopHierarchy(loopGroup.blocks));
+				return blockLoopHierarchies;
+			}
+
+			let blockLoopHierarchies = [];
+			let groupSimilar = loopHandling == this.constructor.loopHandlingSettings.similarGrouped;
+			loopGroups.forEach(loopGroup => {
+				if (loopGroup.mainBlockLoops.length > 1) {
+					// in some cases there is a main loop
+					// that could have its own hierarchy
+					// because there are no sub loops
+					// that belong to it only partly
+					// - Cosmatevs the poet
+					loopGroup.mainBlockLoops.sort((a, b) => b.length - a.length);
+					loopGroup.mainBlockLoops.forEach(mainBlockLoop => {
+						if (mainBlockLoop.length === loopGroup.blocks.size)
+							return;
+
+						for (let i = 0; i < loopGroup.subBlockLoops.length; i++) {
+							let subBlockLoop = loopGroup.subBlockLoops[i];
+							// is any sub block in main block loop
+							if (subBlockLoop.some(subBlock => mainBlockLoop.includes(subBlock)) === false)
+								continue;
+							// is any sub block not in main block loop
+							if (subBlockLoop.some(subBlock => mainBlockLoop.includes(subBlock) === false))
+								return;
+						}
+
+						loopGroup.subBlockLoops.push(mainBlockLoop);
+					});
+				}
+
+				let subLoopHierarchies = this.#getLoopHierarchies(loopGroup.subBlockLoops, loopHandling);
+
+				if (subLoopHierarchies.length === 1) {
+					let subHierarchy = subLoopHierarchies[0];
+					let subHierarchySize = subHierarchy.blocksOnAllLevels.length;
+					let thisHierarchySize = loopGroup.blocks.size;
+
+					if (subHierarchySize === thisHierarchySize) {
+						blockLoopHierarchies.push(subHierarchy);
+						return;
+					}
+					if (groupSimilar && (subHierarchySize + 2 >= thisHierarchySize) && (subHierarchySize / thisHierarchySize >= 0.5)) {
+						subLoopHierarchies = subHierarchy.subBlockLoopHierarchies;
+					}
+				}
+
+				let bhavBlockLoopHierarchy = new BhavBlockLoopHierarchy(loopGroup.blocks);
+				subLoopHierarchies.forEach(subLoopHierarchy => {
+					bhavBlockLoopHierarchy.addSubBlockLoopHierarchy(subLoopHierarchy);
+				});
+				blockLoopHierarchies.push(bhavBlockLoopHierarchy);
+			});
+
+			return blockLoopHierarchies;
+		}
+
+		static getBlockHierarchies(blocks, properties) {
+			let blockHierarchies = [];
+			let alreadyGroupedBlocks = [];
+
+			let blocksWithIncomingTransitions = blocks
+				.flatMap(block => block.outgoingTransitions
+					.map(transition => transition.endBlock)
+				);
+			
+			// the start block must go first to recognize disconnected blocks correctly
+			let parentBlocks = blocks
+				.filter(block => blocksWithIncomingTransitions.includes(block) === false)
+				.toSorted((a, b) => a.id === BhavBlock.specialIds.start ? -1 : b.id === BhavBlock.specialIds.start ? 1 : a.id - b.id);
+			
+			parentBlocks.forEach(block => {
+				let blockGroup = this.#getRecursiveBlocksAndLoops(block, alreadyGroupedBlocks, []);
+				let blockHierarchy = new BhavBlockHierarchy(blockGroup.blockSet, blockGroup.blockLoops, properties);
+				blockHierarchies.push(blockHierarchy);
+				alreadyGroupedBlocks = alreadyGroupedBlocks.concat(blockHierarchy.blocksOnAllLevels);
+			});
+
+			return blockHierarchies;
+		}
+
+		static #getRecursiveBlocksAndLoops(block, blocksToOmit, blockChain) {
+			let blockOutcome = { blockSet: new Set([block]), blockLoops: [] };
+			let blockChainWithThisBlock = [...blockChain];
+			blockChainWithThisBlock.push(block);
+
+			block.outgoingTransitions.forEach(transition => {
+				if (blocksToOmit.includes(transition.endBlock))
+					return;
+
+				if (blockChainWithThisBlock.includes(transition.endBlock)) {
+					let firstBlockPosition = blockChainWithThisBlock.indexOf(transition.endBlock);
+
+					let blockLoop = blockChainWithThisBlock.slice(firstBlockPosition);
+					blockOutcome.blockLoops.push(blockLoop);
+					return;
+				}
+
+				let recursiveOutcome = this.#getRecursiveBlocksAndLoops(transition.endBlock, blocksToOmit, blockChainWithThisBlock);
+				blockOutcome.blockLoops = blockOutcome.blockLoops.concat(recursiveOutcome.blockLoops);
+				blockOutcome.blockSet = blockOutcome.blockSet.union(recursiveOutcome.blockSet);
+			});
+
+			return blockOutcome;
+		}
+	}
+
+	class BhavBlockLoopHierarchy {
+		constructor(blocks) {
+			this.blocksOnAllLevels = [...new Set(blocks)];
+			this.blocksOnThisLevel = [...this.blocksOnAllLevels];
+			this.subBlockLoopHierarchies = [];
+		}
+
+		addSubBlockLoopHierarchy(subBlockLoopHierarchy) {
+			this.blocksOnThisLevel = this.blocksOnThisLevel.filter(n => !subBlockLoopHierarchy.blocksOnThisLevel.includes(n));
+			subBlockLoopHierarchy.blocksOnAllLevels.forEach(block => {
+				if (!this.blocksOnAllLevels.includes(block))
+					this.blocksOnAllLevels.push(block)
+			});
+			this.subBlockLoopHierarchies.push(subBlockLoopHierarchy);
+		}
+	}
+
+	/* Graph builder */
+
+	class MermaidGraphCodeBuilder {
+		static getCodeFromBlockHierarchies(blockHierarchies) {
+			if (blockHierarchies.length === 0)
+				return 'graph TD';
+
+			let code = 'graph TD\r\n'
+				+ '\r\nclassDef primitive fill:#1885,stroke:#188;'
+				+ '\r\nclassDef global fill:#3805,stroke:#380;'
+				+ '\r\nclassDef semiglobal fill:#8705,stroke:#870;'
+				+ '\r\nclassDef private fill:#b505,stroke:#b50;'
+				+ '\r\nclassDef specialBlock font-size:1.4em;'
+				+ '\r\nclassDef start fill:#36f5,stroke:#36f;'
+				+ '\r\nclassDef true fill:#0905,stroke:#090;'
+				+ '\r\nclassDef false fill:#e205,stroke:#e20;'
+				+ '\r\nclassDef missing fill:#9745,stroke:#974;'
+				+ '\r\nclassDef unknown fill:#9745,stroke:#974;'
+				+ '\r\nclassDef disconnected fill:#7771,stroke:#777,stroke-width:.2rem,stroke-dasharray:20;'
+				+ '\r\nclassDef loop fill:#a4c1,stroke:#a4c,stroke-width:.2rem,stroke-dasharray:20;'
+				+ '\r\n\r\n';
+
+			blockHierarchies.forEach(blockHierarchy => code += this.#getBlockHierarchyCode(blockHierarchy));
+			code += this.#getTransitionsCode(blockHierarchies.flatMap(blockHierarchy => blockHierarchy.blocksOnAllLevels));
+
+			return code;
+		}
+
+		static #getBlockHierarchyCode(blockHierarchy) {
+			let code = '';
+
+			let isDisconnected = !blockHierarchy.blocksOnAllLevels.some(block => block.id === BhavBlock.specialIds.start);
+			let subgraphId = 'sub_' + blockHierarchy.blocksOnAllLevels.map(block => block.id).join('_');
+
+			if (isDisconnected) {
+				code += `subgraph ${subgraphId} [DISCONNECTED]\r\n`;
+			}
+			blockHierarchy.blocksOnThisLevel.forEach(block => {
+				code += this.#getBlockCode(block);
+			});
+
+			blockHierarchy.subBlockLoopHierarchies.forEach(loopHierarchy => {
+				code += this.#getLoopHierarchyCode(loopHierarchy);
+			})
+
+			if (isDisconnected) {
+				code += 'end'
+					+ `\r\nclass ${subgraphId} disconnected`
+					+ '\r\n\r\n'
+			}
+
+			return code;
+		}
+
+		static #getLoopHierarchyCode(blockHierarchyLoop, indentSize = 0) {
+			let indent = this.#getIndent(indentSize);
+			let subgraphId = `loop_${blockHierarchyLoop.blocksOnAllLevels.map(block => block.id).join('_')}`;
+			let code = `${indent}subgraph ${subgraphId} [LOOP]\r\n`;
+			blockHierarchyLoop.blocksOnThisLevel.forEach(block => {
+				code += this.#getBlockCode(block, indentSize + 1);
+			});
+			if (blockHierarchyLoop.subBlockLoopHierarchies.length > 0) {
+				blockHierarchyLoop.subBlockLoopHierarchies.forEach(subBlockLoopHierarchy => {
+					code += this.#getLoopHierarchyCode(subBlockLoopHierarchy, indentSize + 1);
+				});
+			}
+			code += `${indent}end`
+				+ `\r\n${indent}class ${subgraphId} loop`
+				+ '\r\n\r\n'
+
+			return code;
+		}
+
+		static #instanceEmojiMap = {
+			0x0002: '🧮', // expression
+			0x0024: '💬', // dialog
+			0x0000: '⏳', // sleep
+			0x0118: '⏳', // idle
+			0x016E: '⏳',
+			0x000F: '💥', // break point
+			0x007E: '🪐', // lua script
+			0x0008: '🎲', // random
+			0x01D2: '🎲',
+			0x049F: '🎲',
+			0x05F1: '🎲',
+			0x05F3: '🎲'
+		};
+
+		static #getBlockCode(block, indentSize = 0) {
+			let indent = this.#getIndent(indentSize);
+			if (block.isSpecial === true) {
+				return `${indent}${block.id}[${block.name}]`
+					+ `\r\n${indent}class ${block.id} specialBlock`
+					+ `\r\n${indent}class ${block.id} ${block.type}`
+					+ '\r\n\r\n';
+			}
+			
+			let instanceEmoji = this.#instanceEmojiMap[block.instance] ?? '';
+
+			return `${indent}${block.id}["${toHex(block.id)} [${block.type} ${toHex(block.instance, 4)}]`
+				+ `<br>${instanceEmoji} <b>${block.name}<\/b>`
+				+ `<br>${block.description}"]`
+				+ `\r\n${indent}class ${block.id} ${block.type}`
+				+ '\r\n\r\n';
+		}
+
+		static #getTransitionsCode(blocks, currentTransitionId = -1) {
+			let code = "";
+			let transitionIdsOfTypes = new Map();
+			currentTransitionId++;
+			blocks.forEach(block => {
+				block.outgoingTransitions.forEach(transition => {
+					code += `\r\n${transition.startBlock.id}-->${transition.endBlock.id}`;
+					let transitionIdsOfType = transitionIdsOfTypes.get(transition.type);
+					if (transitionIdsOfType === undefined)
+						transitionIdsOfTypes.set(transition.type, [currentTransitionId]);
+					else
+						transitionIdsOfType.push(currentTransitionId);
+					currentTransitionId++;
+				});
+			});
+
+			for (const [type, ids] of transitionIdsOfTypes) {
+				code += `\r\nlinkStyle ${ids.join(",")} stroke-width:.2em`;
+				if (type === BhavTransition.types.true)
+					code += `,stroke:#0908`
+				else if (type === BhavTransition.types.false)
+					code += `,stroke:#e208`;
+				else
+					code += `,stroke:#7778`;
+			}
+
+			return code;
+		}
+
+		static #getIndent(indentSize) {
+			return '\t'.repeat(indentSize);
+		}
+	}
+</script>
+</body>
+</html>
