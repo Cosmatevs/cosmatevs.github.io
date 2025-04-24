@@ -200,16 +200,16 @@
 	</section>
 
 	<script>
-	const inputArea = document.getElementById("input-code");
-	const loopHandlingSelect = document.getElementById("loop-handling-select");
-	const directionSelect = document.getElementById("direction-select");
-	const themeSelect = document.getElementById("theme-select");
-	const pasteButton = document.getElementById("paste-button");
-	const tutorialButton = document.getElementById("tutorial-button");
-	const outputArea = document.getElementById("output-code");
-	const visualOutput = document.getElementById("visual-output");
-	const diagramWrapper = document.getElementById("diagram-wrapper");
-	const diagramResetViewButton = document.getElementById("diagram-reset-view-button");
+	const inputArea = document.getElementById('input-code');
+	const loopHandlingSelect = document.getElementById('loop-handling-select');
+	const directionSelect = document.getElementById('direction-select');
+	const themeSelect = document.getElementById('theme-select');
+	const pasteButton = document.getElementById('paste-button');
+	const tutorialButton = document.getElementById('tutorial-button');
+	const outputArea = document.getElementById('output-code');
+	const visualOutput = document.getElementById('visual-output');
+	const diagramWrapper = document.getElementById('diagram-wrapper');
+	const diagramResetViewButton = document.getElementById('diagram-reset-view-button');
 
 	inputArea.addEventListener('input', debounce(() => handleInput(inputArea.value), 500));
 	loopHandlingSelect.addEventListener('change', () => handleInput(inputArea.value));
@@ -232,12 +232,12 @@
 	}
 
 	function handleInput(input) {
-		outputArea.classList.remove("error");
+		outputArea.classList.remove('error');
 
 		if (input.trim().length === 0)
 		{
-			outputArea.value = "";
-			setupDiagram("");
+			outputArea.value = '';
+			setupDiagram('');
 			return;
 		}
 		try {
@@ -251,55 +251,55 @@
 		catch (error) {
 			console.error(error);
 			outputArea.value = `The tool couldn't translate your BHAV into a mermaid diagram. Make sure it's correct.\r\n\r\n${error}`;
-			outputArea.classList.add("error");
-			diagramWrapper.innerHTML = "";
+			outputArea.classList.add('error');
+			diagramWrapper.innerHTML = '';
 		}
 	}
 
 	function setupDiagram(mermaidCode) {
-		diagramWrapper.innerHTML = "";
+		diagramWrapper.innerHTML = '';
 
 		if (mermaidCode.trim().length === 0) {
 			return;
 		}
 
-		visualOutput.classList.add("loading");
-		fetch("https://kroki.io/mermaid/svg", {
-			method: "POST",
+		visualOutput.classList.add('loading');
+		fetch('https://kroki.io/mermaid/svg', {
+			method: 'POST',
 			body: mermaidCode,
-			headers: { "Content-type": "text/plain" }
+			headers: { 'Content-type': 'text/plain' }
 			})
 			.then(response => response.text())
 			.then(svgMarkup => {
 				diagramWrapper.innerHTML = svgMarkup;
 				updateDiagramAppearance();
-				diagramWrapper.classList.remove("error");
+				diagramWrapper.classList.remove('error');
 				resetView();
 			})
 			.catch(error => {
 				console.error(error);
-				diagramWrapper.classList.add("error");
-				diagramWrapper.innerHTML = "";
+				diagramWrapper.classList.add('error');
+				diagramWrapper.innerHTML = '';
 			})
 			.finally(() => {
-				visualOutput.classList.remove("loading");
+				visualOutput.classList.remove('loading');
 			});
 	}
 
 	function updateDiagramAppearance() {
-		let styleHolder = document.querySelector("#diagram-wrapper svg.flowchart style");
+		let styleHolder = document.querySelector('#diagram-wrapper svg.flowchart style');
 		let style = styleHolder.innerHTML;
-		style = style.replace(/(?<=\.marker\w*{).*?(?=})/, "fill:context-stroke;stroke:none;"); // make arrow heads use line colors
-		style = style.replace(/(?<=font-family:).*?(?=;)/g, "var(--font-family)");
-		style = style.replace(/(?<=(?<!-)color:).*?(?=;)/g, "var(--diagram-text-color)");
-		style += "foreignObject{overflow:visible;}"; // avoid text cutoff probably caused by font change and bold style
+		style = style.replace(/(?<=\.marker\w*{).*?(?=})/, 'fill:context-stroke;stroke:none;'); // make arrow heads use line colors
+		style = style.replace(/(?<=font-family:).*?(?=;)/g, 'var(--font-family)');
+		style = style.replace(/(?<=(?<!-)color:).*?(?=;)/g, 'var(--diagram-text-color)');
+		style += 'foreignObject{overflow:visible;}'; // avoid text cutoff probably caused by font change and bold style
 		styleHolder.innerHTML = style;
 
-		let arrowHead = document.getElementById("container_flowchart-v2-pointEnd");
-		arrowHead.setAttribute("markerWidth", 18); // make arrow head bigger
-		arrowHead.setAttribute("markerHeight", 18); // make arrow head bigger
-		arrowHead.setAttribute("refX", 8); // move arrow head to avoid overlapping blocks
-		arrowHead.getElementsByTagName("path")[0].setAttribute("d", "M 0,0 10,5 0,10 3,5 Z"); // change arrow head shape
+		let arrowHead = document.getElementById('container_flowchart-v2-pointEnd');
+		arrowHead.setAttribute('markerWidth', 18); // make arrow head bigger
+		arrowHead.setAttribute('markerHeight', 18); // make arrow head bigger
+		arrowHead.setAttribute('refX', 8); // move arrow head to avoid overlapping blocks
+		arrowHead.getElementsByTagName('path')[0].setAttribute('d', 'M 0,0 10,5 0,10 3,5 Z'); // change arrow head shape
 	}
 
 	function showTutorial() {
@@ -431,7 +431,7 @@ in the Plugin View)
 			undefined: 0xFFFC
 		};
 		static #specialNames = {
-			"-1": 'start',
+			'-1': 'start',
 			0xFFFE: 'false',
 			0xFFFD: 'true',
 			0xFFFC: 'undefined'
@@ -495,7 +495,7 @@ in the Plugin View)
 			if (duplicateBlockIds.size === 1)
 				throw new Error(`Block ${toHex([...duplicateBlockIds][0])} occurs more than once`);
 			else if (duplicateBlockIds.size > 1)
-				throw new Error(`Blocks ${[...duplicateBlockIds].map(id => toHex(id)).join(", ")} occur more than once`);
+				throw new Error(`Blocks ${[...duplicateBlockIds].map(id => toHex(id)).join(', ')} occur more than once`);
 
 			let expectedBlockIds = [...Array(Math.max(...blocks.map(block => block.id)) + 1).keys()];
 			let missingBlocks = expectedBlockIds.filter(id => blocks.some(block => block.id === id) === false);
@@ -503,7 +503,7 @@ in the Plugin View)
 			if (missingBlocks.length === 1)
 				throw new Error(`Block ${toHex(missingBlocks[0])} is missing or couldn't be translated`);
 			else if (missingBlocks.length > 1)
-				throw new Error(`Blocks ${missingBlocks.map(id => toHex(id)).join(", ")} are missing or couldn't be translated`);
+				throw new Error(`Blocks ${missingBlocks.map(id => toHex(id)).join(', ')} are missing or couldn't be translated`);
 
 			blocks = this.#extendWithSpecialBlocks(blocks);
 			blocks.forEach(block => block.setTransitionReferencesToBlocks(blocks));
@@ -531,9 +531,9 @@ in the Plugin View)
 
 	class BhavTransition {
 		static types = {
-			false: "FALSE",
-			true: "TRUE",
-			both: "BOTH"
+			false: 'FALSE',
+			true: 'TRUE',
+			both: 'BOTH'
 		}
 
 		constructor(startBlockId, endBlockId, type) {
@@ -875,7 +875,7 @@ in the Plugin View)
 		}
 
 		static #getTransitionsCode(blocks, currentTransitionId = -1) {
-			let code = "";
+			let code = '';
 			let transitionIdsOfTypes = new Map();
 			currentTransitionId++;
 			blocks.forEach(block => {
@@ -891,7 +891,7 @@ in the Plugin View)
 			});
 
 			for (const [type, ids] of transitionIdsOfTypes) {
-				code += `\r\nlinkStyle ${ids.join(",")} stroke-width:.2em`;
+				code += `\r\nlinkStyle ${ids.join(',')} stroke-width:.2em`;
 				if (type === BhavTransition.types.true)
 					code += `,stroke:#0908`
 				else if (type === BhavTransition.types.false)
