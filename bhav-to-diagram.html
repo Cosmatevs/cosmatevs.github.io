@@ -5,15 +5,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>The Sims 2 BHAV to Mermaid diagram</title>
 	<link rel="icon" type="image/x-icon" href="favicon.svg">
+	<link rel="stylesheet" href="style.css?v=1"/>
+	<script src="svg-pan-zoom-container.js?v=0.6.1"></script> <!-- https://github.com/luncheon/svg-pan-zoom-container -->
 	<style>
 		:root {
 			--flex-direction-x: column;
 			--flex-direction-y: row;
 			--flex-gap: .5rem;
-			--border-radius: .25rem;
-			--border: solid #0004 1px;
-			--transition: all .05s ease-in-out;
-			--site-background: #444;
 		}
 
 		@media (max-width: 100vh) {
@@ -23,19 +21,11 @@
 			}
 		}
 
-		html {
-			font-size: 16px;
-		}
-
 		body {
 			display: flex;
 			flex-direction: var(--flex-direction-y);
-			margin: 0;
-			padding: .5rem;
 			gap: var(--flex-gap);
 			height: calc(100vh - 2 * .5rem);
-			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Helvetica,Arial,sans-serif,sans-serif;
-			background: var(--site-background);
 		}
 
 		section {
@@ -45,14 +35,8 @@
 			gap: var(--flex-gap);
 		}
 
-		textarea, iframe {
+		textarea {
 			flex-grow: 1;
-		}
-
-		textarea, iframe, button, select {
-			border-radius: var(--border-radius);
-			border: var(--border);
-			font-family: inherit;
 		}
 
 		textarea {
@@ -64,52 +48,14 @@
 			font-weight: 500;
 		}
 
-		textarea[readonly] {
-			opacity: 0.8;
-		}
-
 		textarea.error {
-			color: #fff;
-			background: #a10;
+			background: var(--error-color);
+			color: var(--on-error-color);
 			font-weight: bold;
-		}
-
-		iframe:not([src]) {
-			display: none;
-		}
-
-		button {
-			background: #eee;
-			padding: .2rem .6rem;
-			margin-bottom: .1rem;
-			box-shadow: 0 .2rem 0 #aaa;
-			transition: var(--transition);
-			cursor: pointer;
-		}
-
-		button:active {
-			transform: translateY(.2rem);
-			box-shadow: 0 0 0 #aaa;
-		}
-
-		select {
-			padding: .2rem 1.2rem .2rem .4rem;
-			background: #fff;
-			background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggc3R5bGU9ImZpbGw6YmxhY2s7c3Ryb2tlOm5vbmUiIGQ9Ik0gMCwyLjUgSCAxLjc1IEwgNSw2IDguMjUsMi41IEggMTAgTCA1LDggWiIvPjwvc3ZnPg");
-			background-size: .6rem;
-			background-position: right .3rem top 55%;
-  			background-repeat: no-repeat;
-			appearance: none;
-			cursor: pointer;
 		}
 
 		#textareas {
 			flex: 1 1;
-		}
-
-		#visual-output {
-			flex: 2 0;
-			position: relative;
 		}
 
 		#settings {
@@ -133,19 +79,71 @@
 			align-items: center;
 		}
 
+		#visual-output {
+			flex: 2 0;
+			position: relative;
+			overflow: hidden;
+			border-radius: var(--border-radius);
+			background: var(--diagram-background-color);
+		}
+
+		#visual-output:has(#diagram-wrapper:empty) > * {
+			visibility: hidden;
+		}
+
+		#visual-output.error {
+			background: var(--error-color);
+		}
+
+		#visual-output.dark {
+			--diagram-background-color: #222;
+			--diagram-text-color: #eee;
+		}
+
+		#visual-output.light {
+			--diagram-background-color: #fff;
+			--diagram-text-color: #222;
+		}
+
+		#visual-output.loading:before {
+			content: "Loading…";
+			font-size: 2rem;
+			line-height: 1;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			padding: .5rem 1rem .75rem;
+			background: var(--site-background);
+			border-radius: var(--border-radius);
+		}
+
+		#diagram-wrapper, #diagram-wrapper > svg.flowchart {
+			width: 100%;
+    		height: 100%;
+		}
+
+		#diagram-wrapper {
+			overflow: hidden;
+			padding: .5rem;
+			border: var(--border);
+			user-select: none;
+		}
+
 		#diagram-tooltip {
 			position: absolute;
 			display: flex;
 			overflow: hidden;
-			padding: 0 .2rem .2rem 0;
-			border-top-left-radius: var(--border-radius);
+			padding: 0 .25rem .25rem 0;
 			border-bottom-right-radius: 50%;
 			background: var(--site-background);
 			cursor: help;
 		}
 
-		#diagram:not([src]) + #diagram-tooltip {
-			opacity: 0;
+		#diagram-reset-view-button {
+			position: absolute;
+			right: 0;
+			bottom: 0;
 		}
 	</style>
 </head>
@@ -162,25 +160,24 @@
 				<option value="2" selected>Similar loops grouped</option>
 				<option value="3">Detailed loops</option>
 			</select>
-			<select id="theme-select" title="Change the theme if you cannot see the text in blocks">
-				<option value="base">Dark text</option>
-				<option value="dark" selected>Light text</option>
+			<select id="theme-select" title="Change the theme of the diagram">
+				<option value="light">Light theme</option>
+				<option value="dark" selected>Dark theme</option>
 			</select>
 			<div id="site-icons">
 				<a href="https://github.com/Cosmatevs/cosmatevs.github.io" target="_blank" title="Go to the GitHub repository">
 					<svg width="1.5rem" viewbox="0 0 98 96" xmlns="http://www.w3.org/2000/svg">
-						<path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="#fff"/>
+						<path style="fill:var(--body-text-color);" fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" />
 					</svg>
 				</a>
 				<a href="https://discord.gg/FrUfF8TN2h" target="_blank" title="Join the Discord server: Nopke's Labs">
 					<svg width="1.5rem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
-						<path style="fill:#fff;" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+						<path style="fill:var(--body-text-color);" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
 					</svg>
 				</a>
-				<a href="https://mermaid.live/edit" target="_blank" title="Go to the Mermaid Live website">
-					<svg width="1.5rem" viewBox="0 0 491 491" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-						<path d="M490.16,84.61C490.16,37.912 452.248,0 405.55,0L84.61,0C37.912,0 0,37.912 0,84.61L0,405.55C0,452.248 37.912,490.16 84.61,490.16L405.55,490.16C452.248,490.16 490.16,452.248 490.16,405.55L490.16,84.61Z" style="fill:rgb(255,54,112);"/>
-						<path d="M407.48,111.18C335.587,108.103 269.573,152.338 245.08,220C220.587,152.338 154.573,108.103 82.68,111.18C80.285,168.229 107.577,222.632 154.74,254.82C178.908,271.419 193.35,298.951 193.27,328.27L193.27,379.13L296.9,379.13L296.9,328.27C296.816,298.953 311.255,271.42 335.42,254.82C382.596,222.644 409.892,168.233 407.48,111.18Z" style="fill:white;fill-rule:nonzero;"/>
+				<a href="https://kroki.io/" target="_blank" title="Go to the Kroki website (creates diagrams from text)">
+					<svg width="1.5rem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95.711 95.711">
+						<path style="fill:var(--body-text-color);" d="M 32.059531,94.736733 C 30.305686,93.667273 27.828844,89.242623 25.130126,82.357973 19.608536,68.271933 13.163955,44.816062 9.8156763,26.619078 8.7610873,20.88767 8.3260843,11.653114 8.9660823,8.583263 9.8033263,4.56729 11.937179,2.480681 15.65742,2.040074 l 1.722859,-0.204047 0.957354,1.633604 c 2.32603,3.96907 2.765852,6.357034 3.546447,19.255041 0.505259,8.348515 1.318232,13.397686 2.373679,14.742323 0.726564,0.925636 1.60388,0.440309 2.693197,-1.489862 2.170229,-3.845433 13.173026,-15.769425 17.341021,-18.792875 5.20385,-3.774857 11.493454,-5.734625 18.404466,-5.734625 2.33069,0 2.29701,-0.07207 1.575234,3.370467 -0.246285,1.174662 -0.875252,2.865152 -1.397702,3.756649 -1.470187,2.508688 -5.858464,6.955202 -11.878253,12.035901 -6.2597,5.283182 -14.483775,13.480133 -14.483775,14.436006 0,0.353412 0.198437,0.696626 0.440972,0.762702 4.274456,1.164515 19.46051,7.813615 29.054358,12.721225 10.948726,5.60068 17.778535,10.16419 18.970191,12.67542 0.874299,1.84245 0.762063,5.68216 -0.223161,7.63443 -1.074328,2.12884 -1.971689,2.53039 -5.027083,2.24955 -6.466452,-0.59437 -11.213878,-2.73898 -23.128933,-10.4483 -10.773618,-6.97078 -15.617729,-9.3518 -20.750452,-10.19945 -3.186952,-0.52631 -3.774652,-0.1386 -3.692708,2.4361 0.07606,2.38984 1.008553,4.54222 4.388269,10.12903 4.32483,7.14911 5.575265,11.66431 4.570579,16.50387 -0.512089,2.46671 -1.564157,3.78726 -3.974021,4.98814 -2.169403,1.08106 -3.585905,1.14668 -5.080427,0.23536 z" />
 					</svg>
 				</a>
 			</div>
@@ -188,13 +185,13 @@
 		<textarea id="output-code" readonly title="The BHAV code translated into Mermaid diagram code"></textarea>
 	</section>
 	<section id="visual-output">
-		<iframe id="diagram">
-		</iframe>
-		<div id="diagram-tooltip" title="Pan: click and drag the diagram area &#10;Zoom: use the mouse wheel in the diagram area &#10;Reset view: click the RESET button in the bottom right corner">
+		<div id="diagram-wrapper" data-zoom-on-wheel="zoom-amount: 0.001; min-scale: 0.9; max-scale: 20;" data-pan-on-drag></div>
+		<div id="diagram-tooltip" title="Pan: click and drag the diagram area &#10;Zoom: use the mouse wheel in the diagram area &#10;Reset view: click the 'Reset view' button in the bottom right corner">
 			<svg width="1.5rem" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-				<path style="fill:#fff" d="m0 20c0 11.046 8.9542 20 20 20 11.046 1.42e-4 20-8.954 20-20-1.42e-4 -11.046-8.9542-20-20-20h-20zm19.5-12.5c5 0 7.4998 2.5002 7.4998 6.0002 0 5.5-6.0002 5.9999-6.0002 9.9999 0 1 0.50023 1.5002 0.50023 1.5002h-4.5s-0.50023-1.0001-0.50023-2.5001c0-4.5 5.0002-4.9999 5.0002-8 0-1.5-0.97897-2.5001-2.5001-2.5001-3 0-4.9997 1.9999-4.9997 1.9999v-4.9997s1.9999-1.5002 5.4999-1.5002zm-2e-5 20c2 0 2.9998 1.0001 2.9998 2.5001s-0.99982 2.4996-2.9998 2.4996-3.0003-0.99959-3.0003-2.4996 1.0003-2.5001 3.0003-2.5001z"/>
+				<path style="fill:var(--body-text-color)" d="m0 20c0 11.046 8.9542 20 20 20 11.046 1.42e-4 20-8.954 20-20-1.42e-4 -11.046-8.9542-20-20-20h-20zm19.5-12.5c5 0 7.4998 2.5002 7.4998 6.0002 0 5.5-6.0002 5.9999-6.0002 9.9999 0 1 0.50023 1.5002 0.50023 1.5002h-4.5s-0.50023-1.0001-0.50023-2.5001c0-4.5 5.0002-4.9999 5.0002-8 0-1.5-0.97897-2.5001-2.5001-2.5001-3 0-4.9997 1.9999-4.9997 1.9999v-4.9997s1.9999-1.5002 5.4999-1.5002zm-2e-5 20c2 0 2.9998 1.0001 2.9998 2.5001s-0.99982 2.4996-2.9998 2.4996-3.0003-0.99959-3.0003-2.4996 1.0003-2.5001 3.0003-2.5001z"/>
 			</svg>
 		</div>
+		<button id="diagram-reset-view-button">Reset view</button>
 	</section>
 
 	<script>
@@ -204,13 +201,18 @@
 	const pasteButton = document.getElementById("paste-button");
 	const tutorialButton = document.getElementById("tutorial-button");
 	const outputArea = document.getElementById("output-code");
-	const diagram = document.getElementById("diagram");
+	const visualOutput = document.getElementById("visual-output");
+	const diagramWrapper = document.getElementById("diagram-wrapper");
+	const diagramResetViewButton = document.getElementById("diagram-reset-view-button");
 
 	inputArea.addEventListener('input', debounce(() => handleInput(inputArea.value), 500));
-	themeSelect.addEventListener('change', () => setupDiagram(outputArea.value));
+	themeSelect.addEventListener('change', () => setTheme());
 	loopHandlingSelect.addEventListener('change', () => handleInput(inputArea.value));
 	pasteButton.addEventListener('click', () => pasteClipboardIntoInput());
 	tutorialButton.addEventListener('click', () => showTutorial());
+	diagramResetViewButton.addEventListener('click', () => resetView());
+	
+	setTheme();
 
 	function debounce(callback, wait) {
 		let timeoutId = null;
@@ -227,61 +229,70 @@
 
 		if (input.trim().length === 0)
 		{
-			outputArea.value = '';
-			diagram.removeAttribute("src");
+			outputArea.value = "";
+			setupDiagram("");
 			return;
 		}
 		try {
 			let bhavBlocks = BhavBlock.getBlocksFromSimPeText(input);
-			let bhavBlockHierarchies = BhavBlockHierarchy.getBlockHierarchies(bhavBlocks, getBlockHierarchyProperties());
+			let bhavBlockHierarchies = BhavBlockHierarchy.getBlockHierarchies(bhavBlocks, {	loopHandling: Number(loopHandlingSelect.value) });
 			let mermaidCode = MermaidGraphCodeBuilder.getCodeFromBlockHierarchies(bhavBlockHierarchies);
 			outputArea.value = mermaidCode;
 
-			setupDiagram(mermaidCode, true);
+			setupDiagram(mermaidCode);
 		}
 		catch (error) {
 			console.error(error);
 			outputArea.value = `The tool couldn't translate your BHAV into a mermaid diagram. Make sure it's correct.\r\n\r\n${error}`;
 			outputArea.classList.add("error");
-			diagram.removeAttribute("src");
+			diagramWrapper.innerHTML = "";
 		}
 	}
 
-	function getBlockHierarchyProperties() {
-		let properties = {
-			loopHandling: Number(loopHandlingSelect.value)
-		}
-		return properties;
-	}
+	function setupDiagram(mermaidCode) {
+		diagramWrapper.innerHTML = "";
 
-	function setupDiagram(mermaidCode, resetPanZoom = false) {
 		if (mermaidCode.trim().length === 0) {
-			diagram.removeAttribute("src");
 			return;
 		}
-		try {
-			let mermaidSetup = {
-				"code": mermaidCode,
-				"mermaid": {
-					"theme": themeSelect.value,
-					"useMaxWidth": true
-				},
-				"panZoom": true,
-				"rough": false,
-				"autoSync": false
-			};
-			if (resetPanZoom) {
-				mermaidSetup.zoom = 1;
-				mermaidSetup.pan = { "x": 0, "y": 0 };
-			}
-			diagram.src = "https://mermaid.live/view#base64:" + encodeBase64Uri(JSON.stringify(mermaidSetup));
-			diagram.classList.remove("error");
-		}
-		catch (error) {
-			console.error(error);
-			diagram.classList.add("error");
-			diagram.removeAttribute("src");
-		}
+
+		visualOutput.classList.add("loading");
+		fetch("https://kroki.io/mermaid/svg", {
+			method: "POST",
+			body: mermaidCode,
+			headers: { "Content-type": "text/plain" }
+			})
+			.then(response => response.text())
+			.then(svgMarkup => {
+				diagramWrapper.innerHTML = svgMarkup;
+				updateDiagramAppearance();
+				diagramWrapper.classList.remove("error");
+				resetView();
+			})
+			.catch(error => {
+				console.error(error);
+				diagramWrapper.classList.add("error");
+				diagramWrapper.innerHTML = "";
+			})
+			.finally(() => {
+				visualOutput.classList.remove("loading");
+			});
+	}
+
+	function updateDiagramAppearance() {
+		let styleHolder = document.querySelector("#diagram-wrapper svg.flowchart style");
+		let style = styleHolder.innerHTML;
+		style = style.replace(/(?<=\.marker\w*{).*?(?=})/, "fill:context-stroke;stroke:none;"); // make arrow heads use line colors
+		style = style.replace(/(?<=font-family:).*?(?=;)/g, "var(--font-family)");
+		style = style.replace(/(?<=(?<!-)color:).*?(?=;)/g, "var(--diagram-text-color)");
+		style += "foreignObject{overflow:visible;}"; // avoid text cutoff probably caused by font change and bold style
+		styleHolder.innerHTML = style;
+
+		let arrowHead = document.getElementById("container_flowchart-v2-pointEnd");
+		arrowHead.setAttribute("markerWidth", 18); // make arrow head bigger
+		arrowHead.setAttribute("markerHeight", 18); // make arrow head bigger
+		arrowHead.setAttribute("refX", 8); // move arrow head to avoid overlapping blocks
+		arrowHead.getElementsByTagName("path")[0].setAttribute("d", "M 0,0 10,5 0,10 3,5 Z"); // change arrow head shape
 	}
 
 	function showTutorial() {
@@ -351,13 +362,12 @@ in the Plugin View)
      0010 : 1003 : 00 : FFFD : FFFD : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>grey</b> line shows what happens after a block returns either <i>true</i> or <i>false</i>)`
 
-	function encodeBase64Uri(string) {
-		let bytes = new TextEncoder().encode(string);
-		let binaryString = String.fromCodePoint(...bytes);
-		let base64Encoded = btoa(binaryString);
-		let base64EncodedUri = base64Encoded.replaceAll('\\', '_').replaceAll('+', '-');
+	function setTheme() {
+		visualOutput.className = themeSelect.value;
+	}
 
-		return base64EncodedUri;
+	function resetView() {
+		svgPanZoomContainer.resetScale(diagramWrapper);
 	}
 
 	function removeFromArray(array, object) {
