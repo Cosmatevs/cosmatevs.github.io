@@ -118,16 +118,17 @@
 			border-radius: var(--border-radius);
 		}
 
-		#diagram-wrapper, #diagram-wrapper > svg.flowchart {
-			width: 100%;
-    		height: 100%;
-		}
-
 		#diagram-wrapper {
+			flex: 1 0;
 			overflow: hidden;
 			padding: .5rem;
 			border: var(--border);
 			user-select: none;
+		}
+
+		#diagram-wrapper > svg.flowchart {
+			width: 100%;
+    		height: 100%;
 		}
 
 		#diagram-tooltip {
@@ -159,6 +160,10 @@
 				<option value="1">Outer loops only</option>
 				<option value="2" selected>Similar loops grouped</option>
 				<option value="3">Detailed loops</option>
+			</select>
+			<select id="direction-select" title="Change the diagram flow direction">
+				<option value="TD" selected>Vertical</option>
+				<option value="LR">Horizontal</option>
 			</select>
 			<select id="theme-select" title="Change the theme of the diagram">
 				<option value="light">Light theme</option>
@@ -196,8 +201,9 @@
 
 	<script>
 	const inputArea = document.getElementById("input-code");
-	const themeSelect = document.getElementById("theme-select");
 	const loopHandlingSelect = document.getElementById("loop-handling-select");
+	const directionSelect = document.getElementById("direction-select");
+	const themeSelect = document.getElementById("theme-select");
 	const pasteButton = document.getElementById("paste-button");
 	const tutorialButton = document.getElementById("tutorial-button");
 	const outputArea = document.getElementById("output-code");
@@ -206,8 +212,9 @@
 	const diagramResetViewButton = document.getElementById("diagram-reset-view-button");
 
 	inputArea.addEventListener('input', debounce(() => handleInput(inputArea.value), 500));
-	themeSelect.addEventListener('change', () => setTheme());
 	loopHandlingSelect.addEventListener('change', () => handleInput(inputArea.value));
+	directionSelect.addEventListener('change', () => handleInput(inputArea.value));
+	themeSelect.addEventListener('change', () => setTheme());
 	pasteButton.addEventListener('click', () => pasteClipboardIntoInput());
 	tutorialButton.addEventListener('click', () => showTutorial());
 	diagramResetViewButton.addEventListener('click', () => resetView());
@@ -236,7 +243,7 @@
 		try {
 			let bhavBlocks = BhavBlock.getBlocksFromSimPeText(input);
 			let bhavBlockHierarchies = BhavBlockHierarchy.getBlockHierarchies(bhavBlocks, {	loopHandling: Number(loopHandlingSelect.value) });
-			let mermaidCode = MermaidGraphCodeBuilder.getCodeFromBlockHierarchies(bhavBlockHierarchies);
+			let mermaidCode = MermaidGraphCodeBuilder.getCodeFromBlockHierarchies(bhavBlockHierarchies, directionSelect.value);
 			outputArea.value = mermaidCode;
 
 			setupDiagram(mermaidCode);
@@ -759,11 +766,16 @@ in the Plugin View)
 	/* Graph builder */
 
 	class MermaidGraphCodeBuilder {
-		static getCodeFromBlockHierarchies(blockHierarchies) {
-			if (blockHierarchies.length === 0)
-				return 'graph TD';
+		static flowDirections = ['TD', 'LR'];
 
-			let code = 'graph TD\r\n'
+		static getCodeFromBlockHierarchies(blockHierarchies, flowDirection = this.directions[0]) {
+			if (this.flowDirections.includes(flowDirection) === false)
+				throw new Error(`Unknown flow direction setting: '${flowDirection}'`);
+
+			if (blockHierarchies.length === 0)
+				return '';
+
+			let code = `graph ${flowDirection}\r\n`
 				+ '\r\nclassDef primitive fill:#1885,stroke:#188;'
 				+ '\r\nclassDef global fill:#3805,stroke:#380;'
 				+ '\r\nclassDef semiglobal fill:#8705,stroke:#870;'
