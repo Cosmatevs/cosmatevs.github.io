@@ -292,7 +292,7 @@
 		style = style.replace(/(?<=\.marker\w*{).*?(?=})/, 'fill:context-stroke;stroke:none;'); // make arrow heads use line colors
 		style = style.replace(/(?<=font-family:).*?(?=;)/g, 'var(--font-family)');
 		style = style.replace(/(?<=(?<!-)color:).*?(?=;)/g, 'var(--diagram-text-color)');
-		style += 'foreignObject{overflow:visible;}'; // avoid text cutoff probably caused by font change and bold style
+		style += 'foreignObject{overflow:visible;justify-items: center;}'; // avoid text cutoff probably caused by font change or bold style
 		styleHolder.innerHTML = style;
 
 		let arrowHead = document.getElementById('container_flowchart-v2-pointEnd');
@@ -327,11 +327,11 @@ in the Plugin View)
      0002 : 0002 : 00 : 0004 : 0003 : 00000000000000000000000000000000
 [prim 0x0002] Expression  (Is the 'Special buttons' checkbox checked? (It's on the bottom right))
 
-     0003 : 0002 : 00 : 0004 : FFFC : 00000000000000000000000000000000
-[prim 0x0002] Expression  (Check the 'Special buttons' checkbox)
+     0003 : 2003 : 00 : 0004 : FFFC : 00000000000000000000000000000000
+[semi 0x2003] Check the 'Special buttons' checkbox ()
 
-     0004 : 2003 : 00 : 0005 : FFFC : 00000000000000000000000000000000
-[semi 0x2003] Click the 'Copy' button  ()
+     0004 : 2004 : 00 : 0005 : FFFC : 00000000000000000000000000000000
+[semi 0x2004] Click the 'Copy' button  ()
 
      0005 : 1004 : 00 : 0006 : FFFC : 00000000000000000000000000000000
 [private 0x1004] Paste the copied BHAV in the tool (in the first textarea, on the left side)
@@ -339,34 +339,37 @@ in the Plugin View)
      0006 : 0118 : 00 : 0007 : FFFC : 00000000000000000000000000000000
 [global 0x0118] Idle (1 second)
 
-     0007 : 0002 : 00 : 0008 : 000A : 00000000000000000000000000000000
+     0007 : 0002 : 00 : 0006 : 0008 : 00000000000000000000000000000000
+[prim 0x0002] Expression (Can you see a big 'Loading…'?)
+
+     0008 : 0002 : 00 : 0009 : 000B : 00000000000000000000000000000000
 [prim 0x0002] Expression (Is the diagram visible?)
 
-     0008 : 0002 : 00 : FFFD : 0009 : 00000000000000000000000000000000
+     0009 : 0002 : 00 : FFFD : 000A : 00000000000000000000000000000000
 [prim 0x0002] Expression (Does the diagram look correct?)
 
-     0009 : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
+     000A : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
 [semi 0x2008] Report a bug on GitHub or Discord (Attach the BHAV code you've pasted into the tool. Explain what's wrong with the diagram)
 
-     000A : 0002 : 00 : 000B : 000C : 00000000000000000000000000000000
+     000B : 0002 : 00 : 000C : 000D : 00000000000000000000000000000000
 [prim 0x0002] Expression (Is the second textarea red?)
 
-     000B : 0002 : 00 : 0001 : 000C : 00000000000000000000000000000000
+     000C : 0002 : 00 : 0001 : 000D : 00000000000000000000000000000000
 [prim 0x0002] Expression (Does the error description in it imply that it's your fault and you think it might be true?)
 
-     000C : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
+     000D : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
 [semi 0x2008] Report a bug on GitHub or Discord (Attach the BHAV code you've pasted into the tool)
 
-     000D : 0002 : 00 : FFFD : 000E : 00000000000000000000000000000000
+     000E : 0002 : 00 : FFFD : 000E : 00000000000000000000000000000000
 [prim 0x0002] Expression (Do you know what the colors of lines with arrows mean?)
 
-     000E : 1003 : 00 : 000F : 000F : 00000000000000000000000000000000
+     000F : 1003 : 00 : 0010 : 0010 : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>green</b> line shows what happens after a block returns <i>true</i>)
 
-     000F : 1003 : 00 : 0010 : 0010 : 00000000000000000000000000000000
+     0010 : 1003 : 00 : 0011 : 0011 : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>red</b> line shows what happens after a block returns <i>false</i>)
 
-     0010 : 1003 : 00 : FFFD : FFFD : 00000000000000000000000000000000
+     0011 : 1003 : 00 : FFFD : FFFD : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>grey</b> line shows what happens after a block returns either <i>true</i> or <i>false</i>)`
 
 	function setTheme() {
@@ -398,26 +401,41 @@ in the Plugin View)
 				: this.instance < 0x2000 ? 'private'
 				: this.instance < 0x10000 ? 'semiglobal'
 				: 'unknown');
-			this.outgoingTransitions = this.#prepareRawOutgoingTransitions(this.trueBlockId, this.falseBlockId);
+			this.outgoingTransitions = this.#prepareRawOutgoingTransitions();
 			delete this.trueBlockId;
 			delete this.falseBlockId;
 		}
 
-		#prepareRawOutgoingTransitions(trueBlockId, falseBlockId) {
+		#prepareRawOutgoingTransitions() {
 			let transitions = [];
-			if (trueBlockId === falseBlockId) {
-				if (trueBlockId !== null)
-					transitions.push(new BhavTransition(this.id, trueBlockId, BhavTransition.types.both));
+			if (this.trueBlockId === this.falseBlockId) {
+				if (this.trueBlockId !== null)
+					transitions.push(new BhavTransition(this.id, this.trueBlockId, BhavTransition.types.both));
 			}
 			else {
-				if (trueBlockId !== null)
-					transitions.push(new BhavTransition(this.id, trueBlockId, BhavTransition.types.true));
+				if (this.trueBlockId !== null)
+					transitions.push(new BhavTransition(this.id, this.trueBlockId, BhavTransition.types.true));
 
-				if (falseBlockId !== this.constructor.specialIds.undefined && falseBlockId !== null) {
-					transitions.push(new BhavTransition(this.id, falseBlockId, BhavTransition.types.false));
+				if (this.#shouldShowFalseTransition()) {
+					transitions.push(new BhavTransition(this.id, this.falseBlockId, BhavTransition.types.false));
 				}
 			}
 			return transitions;
+		}
+
+		static expressionComparisonOperators = ['00', '01', '02', '08', '0B', '0E', '0F', '10', '11'];
+
+		#shouldShowFalseTransition() {
+			if (this.falseBlockId === null)
+				return false;
+
+			if (this.falseBlockId !== this.constructor.specialIds.undefined)
+				return true;
+
+			if (this.instance != 0x0002) // not expression
+				return false;
+			
+			return this.constructor.expressionComparisonOperators.includes(this.rawOperands.substring(10, 12));
 		}
 
 		setTransitionReferencesToBlocks(blocks) {
@@ -784,8 +802,8 @@ in the Plugin View)
 				+ '\r\nclassDef start fill:#36f5,stroke:#36f;'
 				+ '\r\nclassDef true fill:#0905,stroke:#090;'
 				+ '\r\nclassDef false fill:#e205,stroke:#e20;'
-				+ '\r\nclassDef missing fill:#9745,stroke:#974;'
-				+ '\r\nclassDef unknown fill:#9745,stroke:#974;'
+				+ '\r\nclassDef missing fill:#7775,stroke:#777;'
+				+ '\r\nclassDef undefined fill:#7775,stroke:#777;'
 				+ '\r\nclassDef disconnected fill:#7771,stroke:#777,stroke-width:.2rem,stroke-dasharray:20;'
 				+ '\r\nclassDef loop fill:#a4c1,stroke:#a4c,stroke-width:.2rem,stroke-dasharray:20;'
 				+ '\r\n\r\n';
