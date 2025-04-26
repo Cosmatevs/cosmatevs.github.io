@@ -92,7 +92,7 @@
 		}
 
 		#visual-output.error {
-			background: var(--error-color);
+			box-shadow: 0 0 0 .25rem var(--error-color) inset;
 		}
 
 		#visual-output.dark {
@@ -263,6 +263,7 @@
 			return;
 		}
 
+		visualOutput.classList.remove('error');
 		visualOutput.classList.add('loading');
 		fetch('https://kroki.io/mermaid/svg', {
 			method: 'POST',
@@ -272,14 +273,15 @@
 			.then(response => response.text())
 			.then(svgMarkup => {
 				diagramWrapper.innerHTML = svgMarkup;
-				updateDiagramAppearance();
-				diagramWrapper.classList.remove('error');
 				resetView();
 			})
 			.catch(error => {
 				console.error(error);
-				diagramWrapper.classList.add('error');
+				visualOutput.classList.add('error');
 				diagramWrapper.innerHTML = '';
+			})
+			.then(() => {
+				updateDiagramAppearance();
 			})
 			.finally(() => {
 				visualOutput.classList.remove('loading');
@@ -360,7 +362,7 @@ in the Plugin View)
      000D : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
 [semi 0x2008] Report a bug on GitHub or Discord (Attach the BHAV code you've pasted into the tool)
 
-     000E : 0002 : 00 : FFFD : 000E : 00000000000000000000000000000000
+     000E : 0002 : 00 : FFFD : 000F : 00000000000000000000000000000000
 [prim 0x0002] Expression (Do you know what the colors of lines with arrows mean?)
 
      000F : 1003 : 00 : 0010 : 0010 : 00000000000000000000000000000000
@@ -720,6 +722,7 @@ in the Plugin View)
 
 			let blocksWithIncomingTransitions = blocks
 				.flatMap(block => block.outgoingTransitions
+					.filter(transition => block != transition.endBlock)
 					.map(transition => transition.endBlock)
 				);
 			
@@ -877,7 +880,7 @@ in the Plugin View)
 		static #getBlockCode(block, indentSize = 0) {
 			let indent = this.#getIndent(indentSize);
 			if (block.isSpecial === true) {
-				return `${indent}${block.id}[${block.name}]`
+				return `${indent}${block.id}{{${block.name}}}`
 					+ `\r\n${indent}class ${block.id} specialBlock`
 					+ `\r\n${indent}class ${block.id} ${block.type}`
 					+ '\r\n\r\n';
@@ -885,9 +888,9 @@ in the Plugin View)
 			
 			let instanceEmoji = this.#instanceEmojiMap[block.instance] ?? '';
 
-			return `${indent}${block.id}["${toHex(block.id)} [${block.type} ${toHex(block.instance, 4)}]`
+			return `${indent}${block.id}("${toHex(block.id)} [${block.type} ${toHex(block.instance, 4)}]`
 				+ `<br>${instanceEmoji} <b>${block.name}<\/b>`
-				+ `<br>${block.description}"]`
+				+ `<br>${block.description}")`
 				+ `\r\n${indent}class ${block.id} ${block.type}`
 				+ '\r\n\r\n';
 		}
