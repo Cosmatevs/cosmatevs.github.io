@@ -653,10 +653,10 @@ in the Plugin View)
 			blockLoopsSorted.forEach(blockLoop => {
 				let intersectingLoopGroups = loopGroups
 					.filter(loopGroup => loopGroup.blockSet.isDisjointFrom(blockLoop.blockSet) == false);
-
+				
 				if (intersectingLoopGroups.length === 0) {
 					let loopGroup = {
-						blockSet: blockLoop.blockSet,
+						blockSet: new Set(blockLoop.blockSet),
 						subBlockLoops: []
 					}
 					loopGroups.push(loopGroup);
@@ -664,15 +664,15 @@ in the Plugin View)
 				}
 				
 				// merge groups
-				let firstLoopGroup = intersectingLoopGroups[0];
-				for (let i = 0; i < intersectingLoopGroups.length; i++) {
+				let mainLoopGroup = intersectingLoopGroups[0];
+				mainLoopGroup.subBlockLoops.push(blockLoop);
+				mainLoopGroup.blockSet = mainLoopGroup.blockSet.union(blockLoop.blockSet);
+				
+				for (let i = 1; i < intersectingLoopGroups.length; i++) {
 					let intersectingLoopGroup = intersectingLoopGroups[i];
-					
-					intersectingLoopGroup.subBlockLoops.push(blockLoop);
-					intersectingLoopGroup.blockSet = intersectingLoopGroup.blockSet.union(blockLoop.blockSet);
 
-					if (i > 0)
-						removeFromArray(loopGroups, intersectingLoopGroup);
+					mainLoopGroup.blockSet = mainLoopGroup.blockSet.union(intersectingLoopGroup.blockSet);
+					removeFromArray(loopGroups, intersectingLoopGroup);
 				}
 			});
 
