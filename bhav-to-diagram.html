@@ -155,11 +155,10 @@
 		<section id="settings">
 			<button id="tutorial-button" title="Replace the code in the BHAV textbox with a tutorial code">Show tutorial</button>
 			<button id="paste-button" title="Paste the copied text from your clipboard into the BHAV textbox">Paste code</button>
-			<select id="loop-handling-select" title="Set how loops are displayed">
-				<option value="0">Don't highlight loops</option>
-				<option value="1">Outer loops only</option>
-				<option value="2" selected>Similar loops grouped</option>
-				<option value="3">Detailed loops</option>
+			<select id="loop-handling-select" title="Set how loops are highlighted">
+				<option value="0">No loops</option>
+				<option value="1">Outer loops</option>
+				<option value="2" selected>Nested loops</option>
 			</select>
 			<select id="direction-select" title="Change the diagram flow direction">
 				<option value="TD" selected>Vertical</option>
@@ -200,6 +199,9 @@
 	</section>
 
 	<script>
+	
+	/* Interactivity setup */
+
 	const inputArea = document.getElementById('input-code');
 	const loopHandlingSelect = document.getElementById('loop-handling-select');
 	const directionSelect = document.getElementById('direction-select');
@@ -381,6 +383,8 @@ in the Plugin View)
 	function resetView() {
 		svgPanZoomContainer.resetScale(diagramWrapper);
 	}
+
+	/* Helper functions */
 
 	function removeFromArray(array, object) {
 		array.splice(array.indexOf(object), 1);
@@ -570,6 +574,13 @@ in the Plugin View)
 		}
 	}
 
+	class BlockLoop {
+		constructor(blocksInLoop, startBlocks) {
+			this.blockSet = blocksInLoop instanceof Set ? blocksInLoop : new Set(blocksInLoop);
+			this.startBlockSet = startBlocks instanceof Set ? startBlocks : new Set(startBlocks);
+		}
+	}
+
 	class BhavBlockHierarchy {
 		blocksOnThisLevel;
 		blocksOnAllLevels;
@@ -579,8 +590,7 @@ in the Plugin View)
 			{
 				none: 0,
 				outerOnly: 1,
-				similarGrouped: 2,
-				detailed: 3
+				nested: 2
 			};
 
 		constructor(blocks, blockLoops, properties) {
@@ -604,109 +614,90 @@ in the Plugin View)
 			if (Object.values(this.constructor.loopHandlingSettings).includes(loopHandling) === false)
 				throw new Error(`Unknown loop handling setting: '${loopHandling}'`);
 
-			if (loopHandling == this.constructor.loopHandlingSettings.none)
+			if (loopHandling == this.constructor.loopHandlingSettings.none || blockLoops.length == 0)
 				return [];
-			
+
+			let mergedBlockLoops = [];
+			let loopStartBlockSet = new Set([...blockLoops.flatMap(blockLoop => [...blockLoop.startBlockSet])]);
+
+			blockLoops.forEach(blockLoop => {
+				let startBlockSet = loopStartBlockSet.intersection(blockLoop.blockSet);
+
+				let matchingMergedBlockLoop = mergedBlockLoops.find(mergedBlockLoop =>
+					startBlockSet.size == mergedBlockLoop.startBlockSet.size
+					&& startBlockSet.isSubsetOf(mergedBlockLoop.startBlockSet)
+				);
+				
+				if (matchingMergedBlockLoop === undefined) {
+					mergedBlockLoops.push(new BlockLoop(blockLoop.blockSet, startBlockSet));
+					return;
+				}
+
+				matchingMergedBlockLoop.blockSet = matchingMergedBlockLoop.blockSet.union(blockLoop.blockSet);
+			});
+
+			return this.#getLoopHierarchiesRecursive(mergedBlockLoops, loopHandling);
+		}
+
+		#getLoopHierarchiesRecursive(blockLoops, loopHandling) {
+			if (blockLoops.length === 0)
+				return [];
+
 			let loopGroups = [];
-			let blockLoopsFromBiggest = blockLoops.toSorted((a, b) => b.length - a.length);
+			let blockLoopsSorted = blockLoops.toSorted((a, b) =>
+				b.startBlockSet.size == a.startBlockSet.size
+				? b.blockSet.size - a.blockSet.size
+				: b.startBlockSet.size - a.startBlockSet.size
+			);
 
-			blockLoopsFromBiggest.forEach(blockLoop => {
-				let matchingLoopGroups = loopGroups
-					.filter(loopGroup => blockLoop
-						.some(block => loopGroup.blocks.has(block)
-						)
-					);
+			blockLoopsSorted.forEach(blockLoop => {
+				let intersectingLoopGroups = loopGroups
+					.filter(loopGroup => loopGroup.blockSet.isDisjointFrom(blockLoop.blockSet) == false);
 
-				if (matchingLoopGroups.length === 0) {
+				if (intersectingLoopGroups.length === 0) {
 					let loopGroup = {
-						blocks: new Set(blockLoop),
-						mainBlockLoops: [blockLoop],
+						blockSet: blockLoop.blockSet,
 						subBlockLoops: []
 					}
 					loopGroups.push(loopGroup);
 					return;
 				}
+				
+				// merge groups
+				let firstLoopGroup = intersectingLoopGroups[0];
+				for (let i = 0; i < intersectingLoopGroups.length; i++) {
+					let intersectingLoopGroup = intersectingLoopGroups[i];
+					
+					intersectingLoopGroup.subBlockLoops.push(blockLoop);
+					intersectingLoopGroup.blockSet = intersectingLoopGroup.blockSet.union(blockLoop.blockSet);
 
-				let firstLoopGroup = matchingLoopGroups[0];
-				blockLoop.forEach(block => firstLoopGroup.blocks.add(block));
-
-				if (matchingLoopGroups.length > 1) {
-					firstLoopGroup.mainBlockLoops.push(blockLoop);
-
-					for (let i = 1; i < matchingLoopGroups.length; i++) {
-						var loopGroupToMerge = matchingLoopGroups[i];
-
-						loopGroupToMerge.blocks.forEach(block => firstLoopGroup.add(block));
-						firstLoopGroup.mainBlockLoops.push(...loopGroupToMerge.mainBlockLoops);
-						firstLoopGroup.subBlockLoops.push(...loopGroupToMerge.subBlockLoops);
-						removeFromArray(loopGroups, loopGroupToMerge);
-					}
-					return;
+					if (i > 0)
+						removeFromArray(loopGroups, intersectingLoopGroup);
 				}
-
-				let shouldBlockLoopBeSub = firstLoopGroup.mainBlockLoops
-					.some(mainBlockLoop =>
-						blockLoop.length < mainBlockLoop.length
-						&& blockLoop.every(block => mainBlockLoop.includes(block))
-					);
-
-				if (shouldBlockLoopBeSub)
-					firstLoopGroup.subBlockLoops.push(blockLoop);
-				else
-					firstLoopGroup.mainBlockLoops.push(blockLoop);
 			});
 
 			if (loopHandling == this.constructor.loopHandlingSettings.outerOnly)
 			{
-				let blockLoopHierarchies = loopGroups.map(loopGroup => new BhavBlockLoopHierarchy(loopGroup.blocks));
+				let blockLoopHierarchies = loopGroups.map(loopGroup => new BhavBlockLoopHierarchy([...loopGroup.blockSet]));
 				return blockLoopHierarchies;
 			}
 
 			let blockLoopHierarchies = [];
-			let groupSimilar = loopHandling == this.constructor.loopHandlingSettings.similarGrouped;
 			loopGroups.forEach(loopGroup => {
-				if (loopGroup.mainBlockLoops.length > 1) {
-					// in some cases there is a main loop
-					// that could have its own hierarchy
-					// because there are no sub loops
-					// that belong to it only partly
-					// - Cosmatevs the poet
-					loopGroup.mainBlockLoops.sort((a, b) => b.length - a.length);
-					loopGroup.mainBlockLoops.forEach(mainBlockLoop => {
-						if (mainBlockLoop.length === loopGroup.blocks.size)
-							return;
-
-						for (let i = 0; i < loopGroup.subBlockLoops.length; i++) {
-							let subBlockLoop = loopGroup.subBlockLoops[i];
-							// is any sub block in main block loop
-							if (subBlockLoop.some(subBlock => mainBlockLoop.includes(subBlock)) === false)
-								continue;
-							// is any sub block not in main block loop
-							if (subBlockLoop.some(subBlock => mainBlockLoop.includes(subBlock) === false))
-								return;
-						}
-
-						loopGroup.subBlockLoops.push(mainBlockLoop);
-					});
-				}
-
-				let subLoopHierarchies = this.#getLoopHierarchies(loopGroup.subBlockLoops, loopHandling);
+				let subLoopHierarchies = this.#getLoopHierarchiesRecursive(loopGroup.subBlockLoops, loopHandling);
 
 				if (subLoopHierarchies.length === 1) {
 					let subHierarchy = subLoopHierarchies[0];
 					let subHierarchySize = subHierarchy.blocksOnAllLevels.length;
-					let thisHierarchySize = loopGroup.blocks.size;
+					let thisHierarchySize = loopGroup.blockSet.size;
 
 					if (subHierarchySize === thisHierarchySize) {
 						blockLoopHierarchies.push(subHierarchy);
 						return;
 					}
-					if (groupSimilar && (subHierarchySize + 2 >= thisHierarchySize) && (subHierarchySize / thisHierarchySize >= 0.5)) {
-						subLoopHierarchies = subHierarchy.subBlockLoopHierarchies;
-					}
 				}
 
-				let bhavBlockLoopHierarchy = new BhavBlockLoopHierarchy(loopGroup.blocks);
+				let bhavBlockLoopHierarchy = new BhavBlockLoopHierarchy([...loopGroup.blockSet]);
 				subLoopHierarchies.forEach(subLoopHierarchy => {
 					bhavBlockLoopHierarchy.addSubBlockLoopHierarchy(subLoopHierarchy);
 				});
@@ -751,10 +742,11 @@ in the Plugin View)
 					return;
 
 				if (blockChainWithThisBlock.includes(transition.endBlock)) {
-					let firstBlockPosition = blockChainWithThisBlock.indexOf(transition.endBlock);
+					let firstBlock = transition.endBlock;
+					let firstBlockPosition = blockChainWithThisBlock.indexOf(firstBlock);
 
-					let blockLoop = blockChainWithThisBlock.slice(firstBlockPosition);
-					blockOutcome.blockLoops.push(blockLoop);
+					let blocksInLoop = blockChainWithThisBlock.slice(firstBlockPosition);
+					blockOutcome.blockLoops.push(new BlockLoop(blocksInLoop, [firstBlock]));
 					return;
 				}
 
