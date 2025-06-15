@@ -1,6 +1,6 @@
 :root {
 	--border-radius: .25rem;
-	--border: solid #0004 1px;
+	--border: 1px solid #0004;
 	--transition: all .05s ease-in-out;
 	--site-background: #444;
 	--body-text-color: white;
