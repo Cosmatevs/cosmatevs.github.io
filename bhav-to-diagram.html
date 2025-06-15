@@ -284,17 +284,20 @@
 	function updateDiagramAppearance() {
 		let styleHolder = document.querySelector('#diagram-wrapper svg.flowchart style');
 		let style = styleHolder.innerHTML;
-		style = style.replace(/(?<=\.marker\w*{).*?(?=})/, 'fill:context-stroke;stroke:none;'); // make arrow heads use line colors
 		style = style.replace(/(?<=font-family:).*?(?=;)/g, 'var(--font-family)');
 		style = style.replace(/(?<=(?<!-)color:).*?(?=;)/g, 'var(--diagram-text-color)');
 		style += 'foreignObject{overflow:visible;justify-items: center;}'; // avoid text cutoff probably caused by font change or bold style
 		styleHolder.innerHTML = style;
 
-		let arrowHead = document.getElementById('container_flowchart-v2-pointEnd');
-		arrowHead.setAttribute('markerWidth', 18); // make arrow head bigger
-		arrowHead.setAttribute('markerHeight', 18); // make arrow head bigger
-		arrowHead.setAttribute('refX', 8); // move arrow head to avoid overlapping blocks
-		arrowHead.getElementsByTagName('path')[0].setAttribute('d', 'M 0,0 10,5 0,10 3,5 Z'); // change arrow head shape
+		let arrowHeads = document.querySelectorAll('[id^=container_flowchart-v2-pointEnd]');
+		arrowHeads.forEach(arrowHead => {
+			arrowHead.setAttribute('markerWidth', 18); // make arrow head bigger
+			arrowHead.setAttribute('markerHeight', 18); // make arrow head bigger
+			arrowHead.setAttribute('refX', 8); // move arrow head to prevent it from overlapping blocks
+			let arrowHeadPath = arrowHead.getElementsByTagName('path')[0];
+			arrowHeadPath.setAttribute('d', 'M 0,0 10,5 0,10 3,5 Z'); // change arrow head shape
+			arrowHeadPath.style.strokeWidth = 0;
+		});
 	}
 
 	function showTutorial() {
