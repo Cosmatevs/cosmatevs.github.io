@@ -6,6 +6,7 @@
 	<title>The Sims 2 BHAV to Mermaid diagram</title>
 	<link rel="icon" type="image/x-icon" href="assets/favicon.svg">
 	<link rel="stylesheet" href="assets/style.css?v=1"/>
+	<script src="assets/debounce.js?v=1"></script>
 	<script src="assets/svg-pan-zoom-container.js?v=0.6.1"></script> <!-- https://github.com/luncheon/svg-pan-zoom-container -->
 	<style>
 		:root {
@@ -222,16 +223,6 @@
 	diagramResetViewButton.addEventListener('click', () => resetView());
 	
 	setTheme();
-
-	function debounce(callback, wait) {
-		let timeoutId = null;
-		return (...args) => {
-			window.clearTimeout(timeoutId);
-			timeoutId = window.setTimeout(
-				() => callback(...args), wait
-			);
-		};
-	}
 
 	function handleInput(input) {
 		outputArea.classList.remove('error');
