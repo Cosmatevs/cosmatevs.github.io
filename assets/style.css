@@ -4,6 +4,7 @@
 	--transition: all .05s ease-in-out;
 	--site-background: #444;
 	--body-text-color: white;
+	--body-padding: .5rem;
 	--error-color: #a10;
 	--on-error-color: white;
 	--font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
@@ -15,10 +16,11 @@ html {
 
 body {
 	margin: 0;
-	padding: .5rem;
+	padding: var(--body-padding);
 	font-family: var(--font-family);
 	background: var(--site-background);
 	color: var(--body-text-color);
+	height: calc(100vh - 2 * var(--body-padding));
 }
 
 /* form elements */
