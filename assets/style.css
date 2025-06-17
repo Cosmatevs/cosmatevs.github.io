@@ -23,6 +23,20 @@ body {
 	height: calc(100vh - 2 * var(--body-padding));
 }
 
+/* text elements */
+
+a {
+	color: #709dff;
+}
+
+a:visited {
+	color: #c398ff;
+}
+
+p {
+	margin-block: .75rem;
+}
+
 /* form elements */
 button {
 	background: #eee;
