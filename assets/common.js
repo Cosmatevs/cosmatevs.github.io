@@ -7,3 +7,7 @@ function debounce(callback, wait) {
         );
     };
 }
+
+function removeFromArray(array, object) {
+    array.splice(array.indexOf(object), 1);
+}

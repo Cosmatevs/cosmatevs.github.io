@@ -7,7 +7,10 @@
 	--body-padding: .5rem;
 	--error-color: #a10;
 	--on-error-color: white;
+	--warning-color: #860;
+	--on-warning-color: white;
 	--font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
+	--flex-gap: .5rem;
 }
 
 html {
@@ -71,4 +74,23 @@ textarea, iframe, button, select {
 
 textarea[readonly] {
 	opacity: 0.8;
+}
+
+/* custom elements */
+#site-icons {
+	display: flex;
+	flex: 0;
+	flex-direction: row;
+	gap: var(--flex-gap);
+	justify-content: center;
+}
+
+#site-icons a {
+	display: flex;
+	align-items: center;
+}
+
+#site-icons img {
+	width: 1.5rem;
+	height: 1.5rem;
 }
