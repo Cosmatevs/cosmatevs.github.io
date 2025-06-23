@@ -94,3 +94,13 @@ textarea[readonly] {
 	width: 1.5rem;
 	height: 1.5rem;
 }
+
+.corner-tooltip {
+	position: fixed;
+	background: var(--site-background) url("/assets/icons/corner-tooltip.svg") no-repeat;
+	background-size: 1.5rem;
+	width: 1.75rem;
+	height: 1.75rem;
+	border-bottom-right-radius: 50%;
+	cursor: help;
+}

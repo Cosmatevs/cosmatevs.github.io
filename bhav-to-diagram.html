@@ -6,8 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>The Sims 2 BHAV to Mermaid diagram</title>
 	<link rel="icon" type="image/x-icon" href="assets/favicon.svg">
-	<link rel="stylesheet" href="assets/style.css?v=3" />
-	<script src="assets/common.js?v=1"></script>
+	<link rel="stylesheet" href="assets/style.css?v=4" />
+	<script src="assets/common.js?v=2"></script>
 	<script src="assets/svg-pan-zoom-container.js?v=0.6.1"></script> <!-- https://github.com/luncheon/svg-pan-zoom-container -->
 	<style>
 		:root {
@@ -118,16 +118,6 @@
 			height: 100%;
 		}
 	
-		#diagram-tooltip {
-			position: absolute;
-			display: flex;
-			overflow: hidden;
-			padding: 0 .25rem .25rem 0;
-			border-bottom-right-radius: 50%;
-			background: var(--site-background);
-			cursor: help;
-		}
-	
 		#diagram-reset-view-button {
 			position: absolute;
 			right: 0;
@@ -181,12 +171,8 @@
 	<section id="visual-output">
 		<div id="diagram-wrapper" data-zoom-on-wheel="zoom-amount: 0.001; min-scale: 0.9; max-scale: 20;" data-pan-on-drag>
 		</div>
-		<div id="diagram-tooltip"
+		<div class="corner-tooltip"
 			title="Pan: click and drag the diagram area &#10;Zoom: use the mouse wheel in the diagram area &#10;Reset view: click the 'Reset view' button in the bottom right corner">
-			<svg width="1.5rem" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-				<path style="fill:var(--body-text-color)"
-					d="m0 20c0 11.046 8.9542 20 20 20 11.046 1.42e-4 20-8.954 20-20-1.42e-4 -11.046-8.9542-20-20-20h-20zm19.5-12.5c5 0 7.4998 2.5002 7.4998 6.0002 0 5.5-6.0002 5.9999-6.0002 9.9999 0 1 0.50023 1.5002 0.50023 1.5002h-4.5s-0.50023-1.0001-0.50023-2.5001c0-4.5 5.0002-4.9999 5.0002-8 0-1.5-0.97897-2.5001-2.5001-2.5001-3 0-4.9997 1.9999-4.9997 1.9999v-4.9997s1.9999-1.5002 5.4999-1.5002zm-2e-5 20c2 0 2.9998 1.0001 2.9998 2.5001s-0.99982 2.4996-2.9998 2.4996-3.0003-0.99959-3.0003-2.4996 1.0003-2.5001 3.0003-2.5001z" />
-			</svg>
 		</div>
 		<button id="diagram-reset-view-button">
 			Reset view

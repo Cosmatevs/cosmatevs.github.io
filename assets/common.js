@@ -11,3 +11,7 @@ function debounce(callback, wait) {
 function removeFromArray(array, object) {
     array.splice(array.indexOf(object), 1);
 }
+
+function distinctFilter(value, index, array) {
+    return array.indexOf(value) === index;
+}
