@@ -1,0 +1,151 @@
+id	longName	shortName	extension	canHaveName
+0xFFFFFFFF	--- User Defined ---	----		0
+0xEBFEE33F	Sim DNA	SDNA		0
+0xEBCF3E27	Property Set	GZPS		0
+0xED7D7B4D	Wants XML	XWNT	xml	0
+0xAC8A7A2E	ID Number	IDNO		0
+0x484F5553	House Descriptor	HOUS		1
+0x534C4F54	Slot File	SLOT		1
+0x7BA3838C	Geometric Node	GMND	5gn	0
+0x49596978	Material Definition	TXMT	5tm	0
+0x1C4A276C	Texture Image	TXTR	6tx	0
+0xED534136	Large Image File	LIFO	6li	0
+0xFB00791E	Animation Resource	ANIM	5an	0
+0xFC6EB1F7	Shape	SHPE	5sh	0
+0xE519C933	Resource Node	CRES	5cr	0
+0xAC4F8687	Geometric Data Container	GMDC	5gd	0
+0xC9C81BA3	Lighting (Directional Light)	LDIR	5dl	0
+0xC9C81B9B	Lighting (Ambient Light)	LAMB	5al	0
+0xC9C81BA9	Lighting (Point Light)	LPNT	5pl	0
+0xC9C81BAD	Lighting (Spot Light)	LSPT	5sl	0
+0x4C697E5A	Material Override	MMAT		0
+0xCCA8E925	Object XML	XOBJ	xml	0
+0xACA8EA06	Roof XML	XROF	xml	0
+0x4DCADB7E	Floor XML	XFLR	xml	0
+0x2CB230B8	Fence XML	XFNC	xml	0
+0x6D619378	Neighborhood Object XML	XNGB	xml	0
+0x9012468A	Global Object Lua	GLUA		0
+0x9012468B	Object Lua	OLUA		0
+0x0ABA73AF	Game Wide Inventory	GINV		0
+0x8C1580B5	Hair Tone XML	XHTN	xml	0
+0x2C1FD8A1	Texture Overlay XML	XTOL	xml	0
+0x0C1FE246	Mesh Overlay XML	XMOL	xml	0
+0x4C158081	Skin Tone XML	XSTN	xml	0
+0xAC598EAC	Age Data	AGED		0
+0xCCCEF852	Facial Structure	LxNR		0
+0x0C560F39	Binary Index	BINX		0
+0xAACE2EFB	Sim Description	SDSC		0
+0x8C870743	Family Ties	FAMT		0
+0x4E6D6150	Name Map	NMAP		0
+0xAC506764	3D ID Referencing File	3IDR		0
+0x4E474248	Neighborhood Memory	NGBH		0
+0x43545353	Catalog Description	CTSS		1
+0x4F424A44	Object Data	OBJD		1
+0x474C4F42	Global Data	GLOB		1
+0x42484156	Behavior Function	BHAV		1
+0x53545223	Text Lists	STR#		1
+0xCC364C2A	Sim Relations	SREL		0
+0x54544173	Pie Menu Strings	TTAs		1
+0x54544142	Pie Menu Functions	TTAB		1
+0x0BF999E7	Lot Description	LTXT		0
+0xE86B1EEF	Directory of Compressed Files	CLST	dir	0
+0xB21BE28B	Weather Info	WTHR		0
+0x8A84D7B0	Wall Layer	WLAY		1
+0x5452434E	Behavior Constant Labels	TRCN		1
+0x54505250	Edith Simantics Behavior Labels	TPRP		1
+0x54524545	Edith Flowchart Trees	TREE		1
+0xB1827A47	Game Tip	GTIP		0
+0xCC8A6A69	Previous EP Version Run	PEPV		0
+0xCAC4FC40	String Map	SMAP		1
+0x46414D68	Family History	FAMH		0
+0x3053CF74	Sim Scores	SCOR		0
+0x4F424A66	Object Functions	OBJf		1
+0x54535053	Groups Cache	GROP		0
+0xACE46235	Road Texture	RTEX		1
+0xA2E3D533	Accelerator Key Definitions	KEYD		0
+0x50544250	Package Text	PTBP		0
+0x2C310F46	Popups	POPS		0
+0x6C589723	Lot Definition	LOTD		1
+0x4D51F042	Cinematic Scene	CINE	5cs	0
+0x4B58975B	Lot Texture	LTTX		1
+0xCDB8BDC4	Single Sim Memory	SMEM		0
+0x2DB5C0F4	Neighbor ID Mapping	NIDM		0
+0xABD0DC63	Neighborhood Terrain	NHTR		0
+0x43415453	Catalog String	CATS		0
+0x46574156	Audio Reference	FWAV		1
+0x46434E53	Function	FCNS		1
+0xCD7FE87A	Maxis Material Shader	MATSHAD	matshad	0
+0x7181C501	Unlockable Rewards	REW		0
+0x0B9EB87E	Track Settings	TRKS		0
+0x00000000	UI Data	UI	uiScript	0
+0x42434F4E	Behaviour Constant	BCON		1
+0x54415454	TATT	TATT		1
+0x4F6FD33D	Inventory Item	INIT		0
+0x0F9F0C21	Inventory Item Index	IIDX		0
+0x6F626A74	Object	MOBJT		1
+0xBEEF7B4D	Castaway Mission Goal	GOAL		0
+0xCD95548E	Sim Wants and Fears	SWAF		0
+0xCDB467B8	Content Registry	CREG		0
+0xCC2A6A34	Sim Creation Index	SCID		0
+0x4E524546	Name Reference	NREF		0
+0x46414D49	Family Information	FAMI		0
+0x104F6A6E	Business Info	BNFO		0
+0xEBFEE342	Version Information	VERS		0
+0x8C93BF6C	Face Region XML	XFRG	xml	0
+0x6C93B566	Face Neural XML	XFNU	xml	0
+0x0C93E3DE	Face Modifier XML	XFMD	xml	0
+0x8C93E35C	Face Arch XML	XFCH	xml	0
+0xD1954460	Pet Body Options	PBOP		0
+0x6C4F359D	Collection	COLL		0
+0xAC2950C1	Thumbnail	THUB	jpg	0
+0xCC489E46	Roof Thumbnail	THUMB_ROOF	jpg	0
+0xCC30CDF8	Fence Thumbnail	THUMB_FENCE	jpg	0
+0xEC3126C4	Terrain Thumbnail	THUMB_TERRAIN	jpg	0
+0x4D533EDD	Neighborhood Object Thumbnail	THUMB_NHOBJ	jpg	0
+0x8C311262	Floor Thumbnail	THUMB_FLOOR	jpg	0
+0x8C31125E	Wall Thumbnail	THUMB_WALL	jpg	0
+0x8C3CE95A	Family Thumbnail	THUMB_FAMILY	jpg	0
+0x61754C1B	SimPE Object Lua	SLUA		1
+0xABCB5DA4	Neighborhood Terrain Geometry	NHTG		0
+0x6B943B43	Lot Terrain Geometry	LOTG		1
+0x2A51171B	3D Array	3ARY		1
+0xEBFEE345	Audio Test	AUDT		0
+0x424D505F	Bitmap Image	BMP	bmp	1
+0x44475250	Layered Image	DGRP		1
+0xEA5118B0	Effects List	FX	fx	0
+0x46414345	Face Properties	FACE		0
+0xAB4BA572	Fence Post Layer	FPST		1
+0x8DB5E4C2	FX Sound	FXSD		0
+0x0C7E9A76	JPEG Image	JPG	jpg	0
+0xAC06A676	Lighting (Draw State Light)	LDRS	5ds	0
+0x6A97042F	Lighting (Environment Cube Light)	LENC	5el	0
+0xAC06A66F	Lighting (Linear Fog Light)	LLIF	5lf	0
+0x4F626A4D	Object Metadata Imposters	OBJM		1
+0xFA1C39F7	Object	OBJT		1
+0x50414C54	Image Color Palette (Version 1)	PALT		1
+0x504F5349	Stack Script	POSI		1
+0x8CC0A14B	UNK: 0x8CC0A14B	SDBA		0
+0x53494D49	Sim Information	SIMI		1
+0x53505232	Sprites	SPR2		1
+0x2026960B	mp3 or xa Sound File	MP3	mp3	0
+0xBA353CE1	TSSG System	TSSG		1
+0xCB4387A1	Vertex Layer	VERT		1
+0x0A284D0B	Wall Graph	WGRA		1
+0x49FF7D76	World Database	WRLD		1
+0x584D544F	Material Object?	XMTO		1
+0x584F424A	Object XML	XOBJ2	xml	1
+0x6D814AFE	Wants Tree Item	WNTT	xml	0
+0xADEE8D84	Light Override	NLO	nlo	0
+0x25232B11	Scene Node	SCEN	5sc	0
+0x2C30E040	Fence Arch Thumbnail	THUMB_FARC	jpg	0
+0x2C43CBD4	Foundation or Pool Thumbnail	THUMB_POOL	jpg	0
+0x2C488BCA	Dormer Thmbnail	THUMB_DORM	jpg	0
+0xCC44B5EC	Modular Stair Thumbnail	THUMB_MODST	jpg	0
+0xCC48C51F	Chimney Thumbnail	THUMB_CHIM	jpg	0
+0xF03D464C	Awning Thumbnail	THUMB_AWN	jpg	0
+0xEC44BDDC	Neighborhood View	NHVW		1
+0x7B1ACFCD	Hitlist	HLS		0
+0xBC66BAEC	TS Routing Object Aggregate	TSRO		1
+0x0C900FDB	Pool Surface	POOL		0
+0x50455253	Person state	PERS		1
+0xAB9406AA	Roof	ROOF		1
