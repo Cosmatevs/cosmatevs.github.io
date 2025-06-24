@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>The Sims 2 BHAV to Mermaid diagram</title>
 	<link rel="icon" type="image/x-icon" href="assets/favicon.svg">
-	<link rel="stylesheet" href="assets/style.css?v=6" />
+	<link rel="stylesheet" href="assets/style.css?v=5" />
 	<script src="assets/common.js?v=3"></script>
 	<script src="assets/svg-pan-zoom-container.js?v=0.6.1"></script> <!-- https://github.com/luncheon/svg-pan-zoom-container -->
 	<style>
@@ -37,6 +37,15 @@
 	
 		textarea {
 			flex-grow: 1;
+		}
+	
+		textarea {
+			min-height: 1rem;
+			min-width: 3rem;
+			resize: none;
+			font-family: "Consolas", monospace;
+			font-size: .8rem;
+			font-weight: 500;
 		}
 	
 		textarea.error {
@@ -119,7 +128,7 @@
 
 <body>
 	<section id="textareas">
-		<textarea id="input-code" class="code" spellcheck="false" placeholder="Here goes your BHAV code"></textarea>
+		<textarea id="input-code" spellcheck="false" placeholder="Here goes your BHAV code"></textarea>
 		<section id="settings">
 			<button id="tutorial-button" title="Replace the code in the BHAV textbox with a tutorial code">
 				Show tutorial
@@ -156,7 +165,7 @@
 				</a>
 			</div>
 		</section>
-		<textarea id="output-code" class="code" readonly placeholder="The BHAV code translated into Mermaid diagram code"></textarea>
+		<textarea id="output-code" readonly placeholder="The BHAV code translated into Mermaid diagram code"></textarea>
 	</section>
 	<section id="visual-output">
 		<div id="diagram-wrapper" data-zoom-on-wheel="zoom-amount: 0.001; min-scale: 0.9; max-scale: 20;" data-pan-on-drag>

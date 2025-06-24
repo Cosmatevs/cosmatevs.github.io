@@ -72,20 +72,8 @@ textarea, iframe, button, select {
 	font-family: inherit;
 }
 
-textarea {
-	min-height: 1rem;
-	min-width: 3rem;
-	resize: none;
-}
-
 textarea[readonly] {
 	opacity: 0.8;
-}
-
-textarea.code {
-	font-family: "Consolas", monospace;
-	font-size: .8rem;
-	font-weight: 500;
 }
 
 /* custom elements */
