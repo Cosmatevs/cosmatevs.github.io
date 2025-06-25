@@ -23,7 +23,8 @@ body {
 	font-family: var(--font-family);
 	background: var(--site-background);
 	color: var(--body-text-color);
-	height: calc(100vh - 2 * var(--body-padding));
+	box-sizing: border-box;
+	height: 100vh;
 }
 
 /* text elements */
