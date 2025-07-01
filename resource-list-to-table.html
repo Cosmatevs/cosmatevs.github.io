@@ -209,13 +209,15 @@ Once the list is generated in SimPe, press Ctrl+A to select all the items, and t
 	const tableHolder = document.getElementById('table-holder');
 	const previewArea = document.getElementById('preview');
 
+	let inputAreaDebounce = debounce(() => handleInput(inputArea.value), 500);
 	window.addEventListener('load', async () => {
 		inputArea.disabled = true;
 		await ts2ResourceInfo.initializeGroups();
 		await ts2ResourceInfo.initializeTypes();
 		inputArea.disabled = false;
+		inputArea.addEventListener('input', inputAreaDebounce);
+		inputAreaDebounce(); // handle value retrieved by the browser
 	});
-	inputArea.addEventListener('input', debounce(() => handleInput(inputArea.value), 500));
 	pasteButton.addEventListener('click', () => pasteClipboardIntoInput());
 	copyHTMLButton.addEventListener('click', initializeCopyButtonClick(copyHTMLButton, () => outputHTMLArea.value));
 	copyBBCodeButton.addEventListener('click', initializeCopyButtonClick(copyBBCodeButton, () => outputBBCodeArea.value));

@@ -184,9 +184,12 @@
 	const diagramWrapper = document.getElementById('diagram-wrapper');
 	const diagramResetViewButton = document.getElementById('diagram-reset-view-button');
 
-	inputArea.addEventListener('input', debounce(() => handleInput(inputArea.value), 500));
-	loopHandlingSelect.addEventListener('change', () => handleInput(inputArea.value));
-	directionSelect.addEventListener('change', () => handleInput(inputArea.value));
+	let handleInputFromInputArea = () => handleInput(inputArea.value);
+	let inputAreaDebounce = debounce(handleInputFromInputArea, 500);
+	window.addEventListener('load', inputAreaDebounce); // handle value retrieved by the browser
+	inputArea.addEventListener('input', inputAreaDebounce);
+	loopHandlingSelect.addEventListener('change', handleInputFromInputArea);
+	directionSelect.addEventListener('change', handleInputFromInputArea);
 	themeSelect.addEventListener('change', () => setTheme());
 	pasteButton.addEventListener('click', () => pasteClipboardIntoInput());
 	tutorialButton.addEventListener('click', () => showTutorial());
