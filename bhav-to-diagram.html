@@ -730,7 +730,8 @@ in the Plugin View)
 		}
 
 		addSubBlockLoopHierarchy(subBlockLoopHierarchy) {
-			this.blocksOnThisLevel = this.blocksOnThisLevel.filter(n => !subBlockLoopHierarchy.blocksOnThisLevel.includes(n));
+			this.blocksOnThisLevel = this.blocksOnThisLevel
+				.filter(block => subBlockLoopHierarchy.blocksOnAllLevels.includes(block) == false);
 			subBlockLoopHierarchy.blocksOnAllLevels.forEach(block => {
 				if (!this.blocksOnAllLevels.includes(block))
 					this.blocksOnAllLevels.push(block)
