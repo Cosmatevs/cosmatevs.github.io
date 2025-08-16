@@ -212,11 +212,20 @@ Once the list is generated in SimPe, press Ctrl+A to select all the items, and t
 	let inputAreaDebounce = debounce(() => handleInput(inputArea.value), 500);
 	window.addEventListener('load', async () => {
 		inputArea.disabled = true;
-		await ts2ResourceInfo.initializeGroups();
-		await ts2ResourceInfo.initializeTypes();
+		pasteButton.disabled = true;
+		try {
+			await ts2ResourceInfo.initializeGroups();
+			await ts2ResourceInfo.initializeTypes();
+		}
+		catch (error) {
+			inputArea.value = `An error occurred while fetching the group or resource type databases.\r\n\r\n${error}`;
+			inputArea.classList.add('error');
+			return;
+		}
 		inputArea.disabled = false;
 		inputArea.addEventListener('input', inputAreaDebounce);
 		inputAreaDebounce(); // handle value retrieved by the browser
+		pasteButton.disabled = false;
 	});
 	pasteButton.addEventListener('click', () => pasteClipboardIntoInput());
 	copyHTMLButton.addEventListener('click', initializeCopyButtonClick(copyHTMLButton, () => outputHTMLArea.value));
