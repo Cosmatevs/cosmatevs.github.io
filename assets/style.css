@@ -48,10 +48,13 @@ button {
 	margin-bottom: .1rem;
 	box-shadow: 0 .2rem 0 #aaa;
 	transition: var(--transition);
+}
+
+button:not(:disabled) {
 	cursor: pointer;
 }
 
-button:active {
+button:not(:disabled):active {
 	transform: translateY(.2rem);
 	box-shadow: 0 0 0 #aaa;
 }
@@ -110,7 +113,7 @@ textarea.code {
 
 .corner-tooltip {
 	position: fixed;
-	background: var(--site-background) url("/assets/icons/corner-tooltip.svg") no-repeat;
+	background: var(--site-background) url("./icons/corner-tooltip.svg") no-repeat;
 	background-size: 1.5rem;
 	width: 1.75rem;
 	height: 1.75rem;
