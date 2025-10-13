@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="assets/style.css?v=9" />
 	<script src="assets/common.js?v=3"></script>
 	<script src="assets/svg-pan-zoom-container.js?v=0.6.1"></script> <!-- https://github.com/luncheon/svg-pan-zoom-container -->
+	<script src="assets/mermaid.min.js?v=11.12.0"></script>
 	<style>
 		:root {
 			--flex-direction-x: column;
@@ -151,8 +152,8 @@
 				<a href="https://discord.gg/FrUfF8TN2h" target="_blank" title="Join the Discord server: Nopke's Labs">
 					<img src="assets/icons/discord.svg" />
 				</a>
-				<a href="https://kroki.io/" target="_blank" title="Go to the Kroki website (creates diagrams from text)">
-					<img src="assets/icons/kroki.svg" />
+				<a href="https://docs.mermaidchart.com/mermaid-oss/config/usage.html" target="_blank" title="Go to the Mermaid Charts docs (API for creating diagrams from text)">
+					<img src="assets/icons/mermaid-charts.svg" />
 				</a>
 			</div>
 		</section>
@@ -172,7 +173,9 @@
 	<script>
 	
 	/* Interactivity setup */
-
+	
+	mermaid.initialize({ startOnLoad: false });
+	
 	const inputArea = document.getElementById('input-code');
 	const loopHandlingSelect = document.getElementById('loop-handling-select');
 	const directionSelect = document.getElementById('direction-select');
@@ -183,6 +186,8 @@
 	const visualOutput = document.getElementById('visual-output');
 	const diagramWrapper = document.getElementById('diagram-wrapper');
 	const diagramResetViewButton = document.getElementById('diagram-reset-view-button');
+
+	const inputEvent = new Event('input');
 
 	let handleInputFromInputArea = () => handleInput(inputArea.value);
 	let inputAreaDebounce = debounce(handleInputFromInputArea, 500);
@@ -231,27 +236,22 @@
 
 		visualOutput.classList.remove('error');
 		visualOutput.classList.add('loading');
-		fetch('https://kroki.io/mermaid/svg', {
-			method: 'POST',
-			body: mermaidCode,
-			headers: { 'Content-type': 'text/plain' }
-			})
-			.then(response => response.text())
-			.then(svgMarkup => {
-				diagramWrapper.innerHTML = svgMarkup;
-				resetView();
-			})
-			.catch(error => {
-				console.error(error);
-				visualOutput.classList.add('error');
-				diagramWrapper.innerHTML = '';
-			})
-			.then(() => {
+
+		setTimeout(async () => { // without setTimeout, the 'loading' screen doesn't appear. I don't know how to fix it properly and make this truly async.
+			try {
+				const { svg } = await mermaid.render('container', mermaidCode);
+				diagramWrapper.innerHTML = svg;
+				diagramWrapper.getElementsByTagName('svg')[0].style.maxWidth = null; // max-width breaks the pan-zoom feature
 				updateDiagramAppearance();
-			})
-			.finally(() => {
-				visualOutput.classList.remove('loading');
-			});
+				resetView();
+			}
+			catch (error) {
+				console.error(error);
+				diagramWrapper.innerHTML = '';
+				visualOutput.classList.add('error');
+			}
+			visualOutput.classList.remove('loading');
+		});
 	}
 
 	function updateDiagramAppearance() {
