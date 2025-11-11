@@ -288,26 +288,26 @@
 	}
 
 	const tutorialSimPeBhav = `
-     0000 : 2001 : 00 : 0001 : FFFC : 00000000000000000000000000000000
+     0000 : 2001 : 01 : 0001 : FFFC : 00000000000000000000000000000000
 [semi 0x2001] Open in SimPe a package file with the BHAV (you'd like to see as a diagram)
 
-     0001 : 2002 : 00 : 0002 : FFFC : 00000000000000000000000000000000
+     0001 : 2002 : 01 : 0002 : FFFC : 00000000000000000000000000000000
 [semi 0x2002] Open the BHAV resource (from the Resource List,
 in the Plugin View)
 
      0002 : 0002 : 00 : 0004 : 0003 : 00000000000000000000000000000000
 [prim 0x0002] Expression  (Is the 'Special buttons' checkbox checked? (It's on the bottom right))
 
-     0003 : 2003 : 00 : 0004 : FFFC : 00000000000000000000000000000000
+     0003 : 2003 : 01 : 0004 : FFFC : 00000000000000000000000000000000
 [semi 0x2003] Check the 'Special buttons' checkbox ()
 
-     0004 : 2004 : 00 : 0005 : FFFC : 00000000000000000000000000000000
+     0004 : 2004 : 01 : 0005 : FFFC : 00000000000000000000000000000000
 [semi 0x2004] Click the 'Copy' button  ()
 
-     0005 : 1004 : 00 : 0006 : FFFC : 00000000000000000000000000000000
+     0005 : 1004 : 01 : 0006 : FFFC : 00000000000000000000000000000000
 [private 0x1004] Paste the copied BHAV in the tool (in the first textarea, on the left side)
 
-     0006 : 0118 : 00 : 0007 : FFFC : 00000000000000000000000000000000
+     0006 : 0118 : 01 : 0007 : FFFC : 00000000000000000000000000000000
 [global 0x0118] Idle (1 second)
 
      0007 : 0002 : 00 : 0006 : 0008 : 00000000000000000000000000000000
@@ -319,7 +319,7 @@ in the Plugin View)
      0009 : 0002 : 00 : FFFD : 000A : 00000000000000000000000000000000
 [prim 0x0002] Expression (Does the diagram look correct?)
 
-     000A : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
+     000A : 2008 : 01 : FFFE : FFFC : 00000000000000000000000000000000
 [semi 0x2008] Report a bug on GitHub or Discord (Attach the BHAV code you've pasted into the tool. Explain what's wrong with the diagram)
 
      000B : 0002 : 00 : 000C : 000D : 00000000000000000000000000000000
@@ -328,19 +328,19 @@ in the Plugin View)
      000C : 0002 : 00 : 0001 : 000D : 00000000000000000000000000000000
 [prim 0x0002] Expression (Does the error description in it imply that it's your fault and you think it might be true?)
 
-     000D : 2008 : 00 : FFFE : FFFC : 00000000000000000000000000000000
+     000D : 2008 : 01 : FFFE : FFFC : 00000000000000000000000000000000
 [semi 0x2008] Report a bug on GitHub or Discord (Attach the BHAV code you've pasted into the tool)
 
      000E : 0002 : 00 : FFFD : 000F : 00000000000000000000000000000000
 [prim 0x0002] Expression (Do you know what the colors of lines with arrows mean?)
 
-     000F : 1003 : 00 : 0010 : 0010 : 00000000000000000000000000000000
+     000F : 1003 : 01 : 0010 : 0010 : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>green</b> line shows what happens after a block returns <i>true</i>)
 
-     0010 : 1003 : 00 : 0011 : 0011 : 00000000000000000000000000000000
+     0010 : 1003 : 01 : 0011 : 0011 : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>red</b> line shows what happens after a block returns <i>false</i>)
 
-     0011 : 1003 : 00 : FFFD : FFFD : 00000000000000000000000000000000
+     0011 : 1003 : 01 : FFFD : FFFD : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>grey</b> line shows what happens after a block returns either <i>true</i> or <i>false</i>)`
 
 	function setTheme() {
@@ -365,10 +365,10 @@ in the Plugin View)
 			this.description = this.description ?? '';
 			this.type = this.type ?? (
 				this.instance < 0x0000 ? 'unknown'
-				: this.instance < 0x0100 ? 'primitive'
+				: this.instance < 0x0100 ? 'prim'
 				: this.instance < 0x1000 ? 'global'
 				: this.instance < 0x2000 ? 'private'
-				: this.instance < 0x10000 ? 'semiglobal'
+				: this.instance < 0x10000 ? 'semi'
 				: 'unknown');
 			this.outgoingTransitions = this.#prepareRawOutgoingTransitions();
 			delete this.trueBlockId;
@@ -753,9 +753,9 @@ in the Plugin View)
 				return '';
 
 			let code = `graph ${flowDirection}\r\n`
-				+ '\r\nclassDef primitive fill:#1885,stroke:#188;'
+				+ '\r\nclassDef prim fill:#1885,stroke:#188;'
 				+ '\r\nclassDef global fill:#3805,stroke:#380;'
-				+ '\r\nclassDef semiglobal fill:#8705,stroke:#870;'
+				+ '\r\nclassDef semi fill:#8705,stroke:#870;'
 				+ '\r\nclassDef private fill:#b505,stroke:#b50;'
 				+ '\r\nclassDef specialBlock font-size:1.4em;'
 				+ '\r\nclassDef start fill:#36f5,stroke:#36f;'
@@ -844,7 +844,7 @@ in the Plugin View)
 			
 			let instanceEmoji = this.#instanceEmojiMap[block.instance] ?? '';
 
-			return `${indent}${block.id}("${toHex(block.id)} [${block.type} ${toHex(block.instance, 4)}]`
+			return `${indent}${block.id}("${toHex(block.id)} [${block.type} ${toHex(block.instance, 4)} v.${block.version}]`
 				+ `<br>${instanceEmoji} <b>${block.name}<\/b>`
 				+ `<br>${block.description}")`
 				+ `\r\n${indent}class ${block.id} ${block.type}`
