@@ -83,6 +83,12 @@
 			--diagram-background-color: #fff;
 			--diagram-text-color: #222;
 		}
+
+		#visual-output.animate #container .flowchart-link {
+			stroke-dasharray: 15;
+			stroke-dashoffset: 30;
+			animation: dash 1s linear infinite;
+		}
 	
 		#visual-output.loading:before {
 			content: "Loading…";
@@ -137,6 +143,10 @@
 				<option value="TD" selected>Vertical</option>
 				<option value="LR">Horizontal</option>
 			</select>
+			<select id="animation-select" title="Set whether transition lines are static or animated &#10;Animated lines can help you to follow transitions on larger diagrams">
+				<option value="0" selected>Static</option>
+				<option value="1">Animated</option>
+			</select>
 			<select id="theme-select" title="Change the theme of the diagram">
 				<option value="light">Light theme</option>
 				<option value="dark" selected>Dark theme</option>
@@ -179,6 +189,7 @@
 	const inputArea = document.getElementById('input-code');
 	const loopHandlingSelect = document.getElementById('loop-handling-select');
 	const directionSelect = document.getElementById('direction-select');
+	const animationSelect = document.getElementById('animation-select');
 	const themeSelect = document.getElementById('theme-select');
 	const pasteButton = document.getElementById('paste-button');
 	const tutorialButton = document.getElementById('tutorial-button');
@@ -195,13 +206,14 @@
 	inputArea.addEventListener('input', inputAreaDebounce);
 	loopHandlingSelect.addEventListener('change', handleInputFromInputArea);
 	directionSelect.addEventListener('change', handleInputFromInputArea);
-	themeSelect.addEventListener('change', () => setTheme());
+	animationSelect.addEventListener('change', () => updateOutputClasses());
+	themeSelect.addEventListener('change', () => updateOutputClasses());
 	pasteButton.addEventListener('click', () => pasteClipboardIntoInput());
 	tutorialButton.addEventListener('click', () => showTutorial());
 	diagramResetViewButton.addEventListener('click', () => resetView());
 	
 	putPlaceholdersInTitles();
-	setTheme();
+	updateOutputClasses();
 
 	function handleInput(input) {
 		outputArea.classList.remove('error');
@@ -343,8 +355,10 @@ in the Plugin View)
      0011 : 1003 : 01 : FFFD : FFFD : 00000000000000000000000000000000
 [private 0x1003] See explanation (A <b>grey</b> line shows what happens after a block returns either <i>true</i> or <i>false</i>)`
 
-	function setTheme() {
+	function updateOutputClasses() {
 		visualOutput.className = themeSelect.value;
+		if (animationSelect.value == true)
+			visualOutput.classList.add('animate');
 	}
 
 	function resetView() {
@@ -695,6 +709,7 @@ in the Plugin View)
 			return blockHierarchies;
 		}
 
+		// TO DO: optimize – this one can be really slow for big BHAVs
 		static #getRecursiveBlocksAndLoops(block, blocksToOmit, blockChain) {
 			let blockOutcome = { blockSet: new Set([block]), blockLoops: [] };
 			let blockChainWithThisBlock = [...blockChain];
