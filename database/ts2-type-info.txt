@@ -149,3 +149,4 @@ id	longName	shortName	extension	canHaveName
 0x0C900FDB	Pool Surface	POOL		0
 0x50455253	Person state	PERS		1
 0xAB9406AA	Roof	ROOF		1
+0x856DDBAC	jpg/tga/png Image	IMG		0
