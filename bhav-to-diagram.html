@@ -84,7 +84,7 @@
 			--diagram-text-color: #222;
 		}
 
-		#visual-output.animate #container .flowchart-link {
+		#visual-output.animate #diagram-wrapper > svg.flowchart .flowchart-link {
 			stroke-dasharray: 15;
 			stroke-dashoffset: 30;
 			animation: dash 1s linear infinite;
@@ -267,14 +267,15 @@
 	}
 
 	function updateDiagramAppearance() {
-		let styleHolder = document.querySelector('#diagram-wrapper svg.flowchart style');
+		let svgElement = diagramWrapper.querySelector('svg.flowchart');
+		let styleHolder = svgElement.querySelector('style');
 		let style = styleHolder.innerHTML;
 		style = style.replace(/(?<=font-family:).*?(?=;)/g, 'var(--font-family)');
 		style = style.replace(/(?<=(?<!-)color:).*?(?=;)/g, 'var(--diagram-text-color)');
 		style += 'foreignObject{overflow:visible;justify-items: center;}'; // avoid text cutoff probably caused by font change or bold style
 		styleHolder.innerHTML = style;
 
-		let arrowHeads = document.querySelectorAll('[id^=container_flowchart-v2-pointEnd]');
+		let arrowHeads = svgElement.querySelectorAll('marker[id*=-pointEnd]');
 		arrowHeads.forEach(arrowHead => {
 			arrowHead.setAttribute('markerWidth', 18); // make arrow head bigger
 			arrowHead.setAttribute('markerHeight', 18); // make arrow head bigger
