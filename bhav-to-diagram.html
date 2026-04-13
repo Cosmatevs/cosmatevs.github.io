@@ -883,13 +883,13 @@ in the Plugin View)
 			});
 
 			for (const [type, ids] of transitionIdsOfTypes) {
-				code += `\r\nlinkStyle ${ids.join(',')} stroke-width:.2em`;
+				code += `\r\nlinkStyle ${ids.join(',')} opacity:0.6,stroke-width:.2em`;
 				if (type === BhavTransition.types.true)
-					code += `,stroke:#0908`
+					code += `,stroke:#090`
 				else if (type === BhavTransition.types.false)
-					code += `,stroke:#e208`;
+					code += `,stroke:#e20`;
 				else
-					code += `,stroke:#7778`;
+					code += `,stroke:#777`;
 			}
 
 			return code;
