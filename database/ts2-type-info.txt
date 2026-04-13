@@ -78,7 +78,7 @@ id	longName	shortName	extension	canHaveName
 0x7181C501	Unlockable Rewards	REW		0
 0x0B9EB87E	Track Settings	TRKS		0
 0x00000000	UI Data	UI	uiScript	0
-0x42434F4E	Behaviour Constant	BCON		1
+0x42434F4E	Behavior Constant	BCON		1
 0x54415454	TATT	TATT		1
 0x4F6FD33D	Inventory Item	INIT		0
 0x0F9F0C21	Inventory Item Index	IIDX		0
