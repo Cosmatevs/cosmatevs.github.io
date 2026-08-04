@@ -1,6 +1,13 @@
 :root {
 	--border-radius: .25rem;
-	--border: 1px solid #0004;
+	--border-color-base: black;
+	--border-color-alpha: 25%;
+	--border-color: color-mix(in srgb, var(--border-color-base) var(--border-color-alpha), transparent);
+	--border: 1px solid var(--border-color);
+	--form-color: white;
+	--button-color: #eee;
+	--button-shadow-color: color-mix(in srgb, var(--button-color), var(--border-color-base) var(--border-color-alpha));
+	--button-highlight-color: white;
 	--transition: all .05s ease-in-out;
 	--site-background: #444;
 	--body-text-color: white;
@@ -43,10 +50,12 @@ p {
 
 /* form elements */
 button {
-	background: #eee;
+	background: var(--button-color);
 	padding: .2rem .6rem;
-	margin-bottom: .1rem;
-	box-shadow: 0 .2rem 0 #aaa;
+	box-shadow:  0 -.1rem 0 var(--button-shadow-color) inset
+	           , 0  .1rem 0 var(--button-highlight-color) inset
+			   , 0 1px 0 var(--button-shadow-color);
+	transform: translateY(-1px);
 	transition: var(--transition);
 }
 
@@ -55,13 +64,14 @@ button:not(:disabled) {
 }
 
 button:not(:disabled):active {
-	transform: translateY(.2rem);
-	box-shadow: 0 0 0 #aaa;
+	transform: translateY(0);
+	box-shadow: 0  .1rem 0 var(--button-shadow-color) inset
+	          , 0 -.1rem 0 var(--button-highlight-color) inset;
 }
 
 select {
 	padding: .2rem 1.2rem .2rem .4rem;
-	background: #fff;
+	background: var(--form-color);
 	background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggc3R5bGU9ImZpbGw6YmxhY2s7c3Ryb2tlOm5vbmUiIGQ9Ik0gMCwyLjUgSCAxLjc1IEwgNSw2IDguMjUsMi41IEggMTAgTCA1LDggWiIvPjwvc3ZnPg");
 	background-size: .6rem;
 	background-position: right .3rem top 55%;
