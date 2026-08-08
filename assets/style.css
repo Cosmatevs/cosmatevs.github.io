@@ -52,9 +52,9 @@ p {
 button {
 	background: var(--button-color);
 	padding: .2rem .6rem;
-	box-shadow:  0 -.1rem 0 var(--button-shadow-color) inset
-	           , 0  .1rem 0 var(--button-highlight-color) inset
-			   , 0 1px 0 var(--button-shadow-color);
+	box-shadow:  0 -1px 0 var(--button-shadow-color) inset
+			   , 0  2px 0 var(--button-highlight-color) inset
+			   , 0  1px 0 var(--button-shadow-color);
 	transform: translateY(-1px);
 	transition: var(--transition);
 }
@@ -65,8 +65,8 @@ button:not(:disabled) {
 
 button:not(:disabled):active {
 	transform: translateY(0);
-	box-shadow: 0  .1rem 0 var(--button-shadow-color) inset
-	          , 0 -.1rem 0 var(--button-highlight-color) inset;
+	box-shadow: 0  1px 0 var(--button-shadow-color) inset
+			  , 0 -2px 0 var(--button-highlight-color) inset;
 }
 
 select {
